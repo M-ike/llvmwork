@@ -1,0 +1,35 @@
+#目录设置
+ROOT := ./src
+OBJ_DIR := $(ROOT)/bin
+#CPP文件目录
+LIB_DIR := $(ROOT)
+TOOL_DIR := $(ROOT)
+#头文件目录
+INC_DIR := $(ROOT)
+#要编译的文件
+LIB_FILES := canny.c canny_loop_68.c main.c main_loop_4.c scalespace.c scalespace_loop_33.c octave.c image.c image_loop_26.c sort.c sort_loop_1.c gaussconv.c gaussconv_loop_23.c imageio.c imageio_loop_19.c matrix.c matrix_loop_2.c siftfilters.c siftfilters_loop_11.c
+TOOL_FILES := 
+
+#给LIB_FILES加上LIB_DIR,给TOOL_FILES加上TOOL_DIR
+FILES = $(patsubst %,$(LIB_DIR)/%,$(LIB_FILES))  $(patsubst %,$(TOOL_DIR)/%,$(TOOL_FILES))
+
+OBJS = $(patsubst %.c,$(OBJ_DIR)/%.o,$(FILES))
+
+#编译器
+CC = clang -g -I$(INC_DIR)
+CFLAGS = -Wall -O
+#要加载的库
+LIBS = -lm -lgsl -lgslcblas
+
+all: $(OBJ_DIR)/sift
+#链接
+$(OBJ_DIR)/sift: $(OBJS)
+	$(CC) $(OBJS) $(CFLAGS) $(LIBS) -o $@
+#编译
+$(OBJ_DIR)/%.o:	%.c
+	@mkdir -p $(@D)
+	$(CC) -c -o $@ $<
+
+#清除
+clean:
+	rm $(OBJ_DIR)/src/*.o

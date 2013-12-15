@@ -1,0 +1,86 @@
+Constants:
+START_SIGMA=1.600000
+OCTAVE_LIMIT=6
+IMAGES_PER_OCTAVE=3
+SKIP_OCTAVES=1
+MIN_SIZE=24
+MAX_ADJ_STEPS=4
+EDGE_RATIO=10.000000
+CONTRAST_THRESH=0.030000
+CAP=0.200000
+
+Image doubled
+Preprocessing smoothing
+Octave pyramid construction
+  Octave for pic 1024 1024 (0)
+    Gaussian Scale Space
+    Diff Gaussian Space
+    Image halved
+  Octave for pic 512 512 (1)
+    Gaussian Scale Space
+    Diff Gaussian Space
+    Image halved
+  Octave for pic 256 256 (2)
+    Gaussian Scale Space
+    Diff Gaussian Space
+    Image halved
+  Octave for pic 128 128 (3)
+    Gaussian Scale Space
+    Diff Gaussian Space
+    Image halved
+  Octave for pic 64 64 (4)
+    Gaussian Scale Space
+    Diff Gaussian Space
+    Image halved
+  Octave for pic 32 32 (5)
+    Gaussian Scale Space
+    Diff Gaussian Space
+    Image halved
+Keypoint generation
+  Octave 5
+    Looking for peaks
+      found 1 candidates
+    Filtering and localizing
+      have 1 candidates remaining
+    Generating magnitudes and orientations
+    Assigning orientation(s)
+      added 0 keypoints with new orientation
+    Calculating descriptors
+  Octave 4
+    Looking for peaks
+      found 12 candidates
+    Filtering and localizing
+      have 6 candidates remaining
+    Generating magnitudes and orientations
+    Assigning orientation(s)
+      added 5 keypoints with new orientation
+    Calculating descriptors
+  Octave 3
+    Looking for peaks
+      found 57 candidates
+    Filtering and localizing
+      have 22 candidates remaining
+    Generating magnitudes and orientations
+    Assigning orientation(s)
+      added 3 keypoints with new orientation
+    Calculating descriptors
+  Octave 2
+    Looking for peaks
+      found 200 candidates
+    Filtering and localizing
+      have 27 candidates remaining
+    Generating magnitudes and orientations
+    Assigning orientation(s)
+      added 7 keypoints with new orientation
+    Calculating descriptors
+  Octave 1
+    Looking for peaks
+      found 794 candidates
+    Filtering and localizing
+      have 80 candidates remaining
+    Generating magnitudes and orientations
+    Assigning orientation(s)
+      added 26 keypoints with new orientation
+    Calculating descriptors
+Output
+Done. 177 keypoints found.

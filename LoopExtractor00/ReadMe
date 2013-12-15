@@ -1,0 +1,28 @@
+注意：首先修改test/src/run.sh文件中的-I/home/xtxwy/test/LoopExtractor/test/sift_back为你系统上的路径:只需要将/home/xtxwy/test/替换成你LoopExtractor的路径前缀即可。
+
+==========
+自动化测试：
+=========
+进入test目录，运行run.sh可以查看运行结果
+
+========
+手工测试：
+=======
+
+如果想手工运行的话，如下:
+1.编译运行原始版本的sift_code:
+  cd test
+  ./rm.sh
+  make -f Makefile_before
+  cd src/bin
+  ./sift #这个就是生成的可执行文件
+
+2.编译运行循环分割转换后的sift_code：
+  cd test
+  ./rm.sh
+  cd src
+  ./run.sh
+  cd ..
+  make -f Makefile_after
+  cd src/bin
+  ./sift #这个就是生成的可执行文件
