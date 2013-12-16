@@ -1,9 +1,4 @@
 #include "sort_loop_1.h"
-/*
-*  Jan Prokaj
-*  March 5, 2005
-*/
-
 void mergesort(double *table, int start, int end)
 {
 	int k;

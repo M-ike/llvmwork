@@ -1,10 +1,4 @@
 #include "main_loop_4.h"
-/*
-*  Jan Prokaj
-*  March 1, 2005
-*  based on libsift-1.6 -- Sebastian Nowozin (nowozin@cs.tu-berlin.de)
-*/
-
 void printTrashed(FILE *output, KeyPoint *trash, double scale, int octave);
 void printPoints(FILE *output, KeyPoint *peaks, double scale, int octave);
 void printFooter(FILE *output);

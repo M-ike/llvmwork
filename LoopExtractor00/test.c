@@ -1,13 +1,6 @@
 #include "test_loop_1.h"
 
 
-#ifndef NO
-#define NO 10
-#endif
-
-
-
-
 
 void swap(struct st *s1,Node *no);
 

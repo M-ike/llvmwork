@@ -1,13 +1,4 @@
 #include "gaussconv_loop_23.h"
-/*
-*  Jan Prokaj
-*  January 31, 2005
-*/
-
-
-//Does a gaussian 1st derivative (G') convolution on the passsed in image.
-//The resulting image is dynamically allocated and returned
-//via a pointer
 Image* gaussianD1Convolution2D(Image *original, double sigma) {
 
 	int    p, q;

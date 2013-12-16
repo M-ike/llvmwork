@@ -2,6 +2,9 @@
 #define test_loop_1_h_
 
 #include "stdio.h"
+#ifndef NO
+#define NO 10
+#endif
 
 struct st {
          int b;

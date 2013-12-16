@@ -1,14 +1,4 @@
 #include "scalespace_loop_33.h"
-/*
-*  Jan Prokaj
-*  March 5, 2005
-*/
-
-
-//Builds the scale space by incrementally convolving until reaching 2*startSigma
-//If we want IMAGES_PER_OCTAVE number of usable images, we need to produce + 2
-//initial images (or INTERVALS_PER_OCTAVE + 3 as Lowe says). So k is equal
-//to 2^(1/s)
 ScaleSpace *buildScaleSpaceOctave(Image *original, double imgScale, double imageSigma) {
 
 	ScaleSpace *space;

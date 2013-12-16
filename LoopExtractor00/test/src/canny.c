@@ -1,10 +1,4 @@
 #include "canny_loop_68.h"
-/*
-*  Jan Prokaj
-*  May 11, 2005
-*/
-
-//basic algorithm, no performance improvements
 Image *getCannyEdgesClassic(Image *original, float sigma, float percent) {
 
 	int i, j;

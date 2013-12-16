@@ -1,12 +1,4 @@
 #include "matrix_loop_2.h"
-/*
-* Jan Prokaj
-* May 11, 2005
-*/
-
-
-//linear solve here
-
 double dot(Matrix *a, Matrix *b) {
 
 	double sum = 0.0;

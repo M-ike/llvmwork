@@ -1,12 +1,4 @@
 #include "imageio_loop_19.h"
-/*
-*  Jan Prokaj
-*  February 13, 2005
-*/
-
-//Reads image data from file, and returns Image via a pointer
-//Returns NULL, if anything goes wrong
-//Does not handle comments in PGM file!
 Image *readPGMFile(const char *fileName) {
 
 	int  c, value; //for IO

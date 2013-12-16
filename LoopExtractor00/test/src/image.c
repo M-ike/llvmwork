@@ -1,10 +1,4 @@
 #include "image_loop_26.h"
-/*
-*  Jan Prokaj
-*  May 11, 2005
-*  based on ImageMap.cs -- Sebastian Nowozin (nowozin@cs.tu-berlin.de)
-*/
-
 Image *allocateImage(int width, int height) {
 
 	Image *new;

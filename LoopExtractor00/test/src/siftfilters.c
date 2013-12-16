@@ -1,19 +1,4 @@
 #include "siftfilters_loop_11.h"
-/*
-*  Jan Prokaj
-*  May 14, 2005
-*/
-
-// Nowozin's implementation -- description copied
-// Remove peaks by peak magnitude and peak edge response. Find the
-// sub-pixel local offset by interpolation.
-//
-// Sub-pixel localization and peak magnitude:
-// After this method returns, every peak has a relative localization
-// offset and its peak magnitude available.
-//
-// Return a filtered list of KeyPoints, with only the remaining
-// survivors.
 KeyPoint *filterAndLocalizePeaks(ScaleSpace *spaces, ScaleSpace *gaussian, KeyPoint *peaks) {
 
 	KeyPoint *filtered = NULL;

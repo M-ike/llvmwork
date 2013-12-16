@@ -40,8 +40,8 @@ ASTConsumer* LoopExtractAction::CreateASTConsumer(CompilerInstance &CI, StringRe
 
 char *itoa(int num);
 void LoopExtractorConsumer::HandleTranslationUnit(ASTContext &Context) {
-    TranslationUnitDecl* D = Context.getTranslationUnitDecl();
-    D->dump(llvm::outs());
+    //TranslationUnitDecl* D = Context.getTranslationUnitDecl();
+    //D->dump(llvm::outs());
     std::string InputFileOld = "";
     InputFileOld += InputFile;
     InputFileOld.erase(InputFileOld.find_last_of('.'), InputFileOld.size());
@@ -232,72 +232,84 @@ bool LoopExtractorConsumer::collectMacroPosition(FILE *fp,ASTContext &Context){
     //PP.PrintStats();
     for (Preprocessor::macro_iterator I = PP.macro_begin(), E = PP.macro_end();I != E; ++I){
 
-     /*if(const IdentifierInfo *II = dyn_cast<const IdentifierInfo>(I->first))
+     if(const IdentifierInfo *II = dyn_cast<const IdentifierInfo>(I->first))
         if(const  MacroDirective *MD = dyn_cast<const MacroDirective>(I->second)){
-            int lineCount = 0;
-            const MacroInfo *MI = MD->getMacroInfo();
-            SourceLocation sSL=MI->getDefinitionLoc();
-            SourceLocation eSL = MI->getDefinitionEndLoc();
-            int lineStart = SM.getPresumedLoc(sSL).getLine();
-            int lineEnd = SM.getPresumedLoc(eSL).getLine();
-            if(SM.isFromMainFile(sSL)){
-                MacroInFile.push_back(MI);
-                std::string MacroName = II->getName();
-                std::string MContent = "#ifndef ";
-                MContent += MacroName;
-                MContent += "\n";
-                MacroContentInFile[MI] = MContent; 
+            SourceLocation SL=MD->getLocation();
+            if(SM.isFromMainFile(SL)){
+                if(MD->isDefined()){
+                    const MacroInfo *MI = MD->getMacroInfo();
+                    SourceLocation ISL = MI->getDefinitionLoc();
+                    SourceLocation ESL = MI->getDefinitionEndLoc();
+                    int lineStart = SM.getPresumedLoc(ISL).getLine();
+                    int lineEnd = SM.getPresumedLoc(ESL).getLine();
+                    llvm::outs() << lineStart << "  "<< lineEnd <<"\n";
+                    int lineCount = 0;
+                    rewind(fp);
+                    std::string str = getStrBetweenTwoLine(lineStart,lineEnd,lineCount,fp);
+                    std::string MContent = "#ifndef ";
+                    MContent += II->getName();
+                    MContent += "\n";
+                    MContent += str;
+                    MContent += "#endif\n";
+
+                    MacroContentInFile[lineStart] = MContent;
+                }else{
+                    std::string str = "#undef ";
+                    str += II->getName();
+                    str += "\n";
                     
-                std::string str = getStrBetweenTwoLine(lineStart,lineEnd,lineCount,fp);
-                llvm::outs() << II->getName()<< "  "<< lineStart << "  " << lineEnd << "\n";
-                MContent += str;
-                MContent += "#endif\n";
-            }
+                    std::string MContent = "#ifdef ";
+                    MContent += II->getName();
+                    MContent += "\n";
+                    MContent += str;
+                    MContent += "#endif\n";
+                    int lineStart = SM.getPresumedLoc(SL).getLine();
+                    MacroContentInFile[lineStart] = MContent;
+                }
+
+            }else continue;
             
             const MacroDirective *preMD = MD->getPrevious();
             while(preMD != NULL){
                 SourceLocation sSL1 = preMD->getLocation();
                 if(SM.isFromMainFile(sSL1)){
+                    
+                    if(preMD->isDefined()){
                         
-                    llvm::outs() << SM.getPresumedLoc(sSL1).getLine() << "qianyige  ";
-                    llvm::outs() << SM.getPresumedLoc(sSL1).getColumn() << "\n";
+                        const MacroInfo *MI = preMD->getMacroInfo();
+                        SourceLocation ISL = MI->getDefinitionLoc();
+                        SourceLocation ESL = MI->getDefinitionEndLoc();
+                        int lineStart = SM.getPresumedLoc(ISL).getLine();
+                        int lineEnd = SM.getPresumedLoc(ESL).getLine();
+                        llvm::outs() << lineStart << "  "<< lineEnd <<"\n";
+                        int lineCount = 0;
+                        rewind(fp);
+                        std::string str = getStrBetweenTwoLine(lineStart,lineEnd,lineCount,fp);
+                        std::string MContent = "#ifndef ";
+                        MContent += II->getName();
+                        MContent += "\n";
+                        MContent += str;
+                        MContent += "#endif\n";
+                        MacroContentInFile[lineStart] = MContent;
+
+                    }else{
+                        std::string str = "#undef ";
+                        str += II->getName();
+                        str += "\n";
+                        std::string MContent = "#ifdef ";
+                        MContent += II->getName();
+                        MContent += "\n";
+                        MContent += str;
+                        MContent += "#endif\n";
+                        int lineStart = SM.getPresumedLoc(SL).getLine();
+                        MacroContentInFile[lineStart] = MContent;
+                    }
+                        
                 }
                 preMD = preMD->getPrevious();
             }
-       }*/
+       }
 
-       if(const IdentifierInfo *II = dyn_cast<const IdentifierInfo>(I->first)){
-
-            rewind(fp);
-            int lineCount = 0;
-            if(II->hasMacroDefinition()){
-                MacroInfo *MI = PP.getMacroInfo(const_cast<IdentifierInfo*>(II));
-                SourceLocation sSL=MI->getDefinitionLoc();
-                SourceLocation eSL = MI->getDefinitionEndLoc();
-                int lineStart = SM.getPresumedLoc(sSL).getLine();
-                //int colStart = SM.getPresumedLoc(sSL).getColumn();
-                int lineEnd = SM.getPresumedLoc(eSL).getLine();
-                //int colEnd = SM.getPresumedLoc(eSL).getColumn();
-                if(SM.isFromMainFile(sSL)){
-                    MacroInFile.push_back(MI);
-                    std::string MacroName = II->getName();
-                    std::string MContent = "#ifndef ";
-                    MContent += MacroName;
-                    MContent += "\n";
-                    
-                    std::string str = getStrBetweenTwoLine(lineStart,lineEnd,lineCount,fp);
-                    MContent += str;
-                    MContent += "\n#endif\n";
-                    MacroContentInFile[MI] = MContent; 
-                    //llvm::outs() << MContent << "\n";
-                    //llvm::outs() << II->getName()<< "  "<< lineStart << "  " << lineEnd << "\n";
-                    //llvm::outs() << lineEnd << "  " << colEnd << "\n";
-                    //llvm::outs() << II->getName() << "\n";
-                    //llvm::outs() << MI->getDefinitionLength(SM) << "\n";
-                }
-            }
-
-        }
     }
     return true;
 }
@@ -1227,7 +1239,7 @@ bool LoopExtractorConsumer::constructFunction(FILE *fp, ASTContext &context, Fun
     }
 
     NewFunc += ForBody;
-    NewFunc += "}";
+    NewFunc += "\n}";
     
     size_t pos = 0;
     pos = NewFunc.find("sizeof", 0);
@@ -1287,7 +1299,7 @@ bool LoopExtractorConsumer::constructFunction(FILE *fp, ASTContext &context, Fun
             NewFunc.replace(NewFunc.begin()+insteadStart,NewFunc.begin()+insteadEnd,insteadString);
         }
     }
-
+    
     LoopToFunction[FS] = NewFunc;
     if(DebugOutput_LoopExtractAction) llvm::outs() << "构造的函数体如下:\n" << NewFunc << "\n";
     return true;
@@ -1362,11 +1374,29 @@ bool LoopExtractorConsumer::writeNewSourceFile(FILE *fp, raw_ostream &O, std::st
     } else headerFile += FileName;
     
     O << "#include \"" << headerFile << "\"\n";
+    rewind(fp);
+    char aLine[LINE_SIZE] = {0};
+    int lineCount = 0;
+    while(NULL != fgets(aLine,sizeof(aLine),fp)){
+        lineCount++;
+        std::map<int,std::string>::iterator sM = MacroContentInFile.find(lineCount);
+        std::map<int,ForStmt*>::iterator sM1 = ForPosition.find(lineCount);
+        if(sM != MacroContentInFile.end()){
+            O << sM->second << "\n";
+        }
+        if(sM1 != ForPosition.end()){
+            ForStmt *FS = sM1->second;
+            llvm::DenseMap<ForStmt*,std::string>::iterator sMM = LoopToFunction.find(FS);
+            if(sMM != LoopToFunction.end())
+                O << sMM->second  << "\n";
+        }
+    }
     //写代码内部宏
     /*std::string macro = getMacroInCodeBlock(fp);
     if(!macro.empty()) O << macro;
     llvm::outs() << macro << "\n";*/
-    for(std::vector<const MacroInfo*>::iterator sMI = MacroInFile.begin(),eMI = MacroInFile.end();sMI != eMI;++sMI){
+
+    /*for(std::vector<const MacroInfo*>::iterator sMI = MacroInFile.begin(),eMI = MacroInFile.end();sMI != eMI;++sMI){
         const MacroInfo *MI = *sMI;
         O << MacroContentInFile[MI];
     }
@@ -1375,7 +1405,7 @@ bool LoopExtractorConsumer::writeNewSourceFile(FILE *fp, raw_ostream &O, std::st
     for(llvm::DenseMap<ForStmt*, std::string>::iterator sDF = LoopToFunction.begin(), eDF = LoopToFunction.end(); sDF != eDF; ++sDF) {
         std::string NewFunc = sDF->second;
         O << NewFunc << "\n";
-    }
+    }*/
     return true;
 }
 
@@ -1512,19 +1542,7 @@ bool LoopExtractorConsumer::writeSourceFile(FILE *fp, raw_ostream &O, std::strin
         char *str = aLine;
         std::string temp = "";
         while(str[i] == ' ') { i++; }//消除空格
-        if(str[i] == '#'){
-            if(temp.assign(str+i+1,7) == "include") {
-                std::string str2 = aLine;
-                size_t pos = str2.find("/*");
-                if(pos != std::string::npos){
-                    str2.erase(str2.begin(),str2.begin()+pos);
-                    O << str2;
-                }
-                memset(aLine, 0, sizeof(aLine));
-                continue;
-            }
-        }
-        /*if(false == skip) {
+        if(false == skip) {
             //判断以#开头的
             if(str[i] == '#') {
                 if(temp.assign(str+i+1,2)=="if") {
@@ -1548,7 +1566,7 @@ bool LoopExtractorConsumer::writeSourceFile(FILE *fp, raw_ostream &O, std::strin
                    // continue;
                 //}
             } else if(temp.assign(str+i,2) == "//") continue;
-            else if(temp.assign(str+i,2) == "/ *") { //处理注释
+            else if(temp.assign(str+i,2) == "/*") { //处理注释
                 while(1) {
                     str = aLine;
                     j = 0;
@@ -1564,7 +1582,7 @@ bool LoopExtractorConsumer::writeSourceFile(FILE *fp, raw_ostream &O, std::strin
             
         }
             skip = true;
-        */
+       
        
         //处理循环
         std::map<int, int>::iterator sM = LoopPosition.find(lineCount);
@@ -1702,7 +1720,7 @@ std::string LoopExtractorConsumer::getHeader(FILE *fp) {
     if(DebugOutput_LoopExtractAction) llvm::outs() << header1 << "\n";
     return header1;
     */
-    /*rewind(fp);
+    rewind(fp);
     char aLine[LINE_SIZE] = { 0 };
     int ifcount = 0;
     int i = 0;
@@ -1727,7 +1745,7 @@ std::string LoopExtractorConsumer::getHeader(FILE *fp) {
             //其他情况，如#include、#define、#undef.
             } else addString(str, &header, fp);
         } else if(temp.assign(str+i,2) == "//") addString(str, &header, fp);
-        else if(temp.assign(str+i,2) == "/ *") { //处理多行注释
+        else if(temp.assign(str+i,2) == "/*") { //处理多行注释
                                        
             while(1) {
                 header += aLine;
@@ -1741,32 +1759,6 @@ std::string LoopExtractorConsumer::getHeader(FILE *fp) {
         } else if(*str == '\n' || *str == '\r') continue;
         else break;
     }//end of while
-    */
-    rewind(fp);
-    char aLine[LINE_SIZE] = { 0 };
-    int i ;
-    int j=0;
-    while(NULL != fgets(aLine, sizeof(aLine), fp)){
-        i=0;
-        char *str = aLine;
-         j++;
-        while(str[i] == ' ') { 
-            i++; 
-        }//消除空格
-        if(str[i] == '#') {
-            //llvm::outs() << str << "\n";
-            if(temp.assign(str+i+1,7) == "include"){
-                //addString(str, &header, fp);
-                std::string str2 = str;
-                size_t pos = str2.find("/ *");
-                if(pos != std::string::npos){
-                    str2.erase(str2.begin()+pos,str2.end());
-                    str2 += "\n";
-                }
-                header += str2;
-            }
-        }
-    }
 
     if(DebugOutput_LoopExtractAction && !header.empty()) llvm::outs() << "头文件:\n" << header << "\n";
     

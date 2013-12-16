@@ -124,7 +124,7 @@ private:
     std::vector<FunctionDecl*> FunctionInSource;
     std::map<int,int> FunctionInSourcePosition;
     //保存MacroContent
-    llvm::DenseMap<const MacroInfo*,std::string> MacroContentInFile;
+    std::map<int,std::string> MacroContentInFile;
     llvm::DenseMap<FunctionDecl*,std::string> FunctionInSourceContent;
     //保存输入参数
     llvm::DenseMap<ForStmt*, std::vector<ValueDecl*> > InputArgs;
@@ -135,6 +135,7 @@ private:
     llvm::DenseMap<ForStmt*, std::string> CallProto;
     //保存循环转换后的函数
     llvm::DenseMap<ForStmt*, std::string> LoopToFunction;
+    //llvm::DenseMap<int,std::string> LoopToFunction;
     //记录循环位置:开始和结束
         std::map<int, int> LoopPosition;
     //记录结构体的位置:开始和结束
