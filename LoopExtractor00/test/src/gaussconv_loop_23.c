@@ -1,7 +1,7 @@
 #include "gaussconv_loop_23.h"
 void gaussianD1Convolution2D_loop_1(int *i, int *maskSize, double ** *maskX, double ** *maskY)
 {
-	for((*i) = 0; (*i) < (*maskSize); ++(*i)) {
+for((*i) = 0; (*i) < (*maskSize); ++(*i)) {
 		(*maskX)[(*i)] = (double *) malloc((*maskSize)*sizeof(double));
 		(*maskY)[(*i)] = (double *) malloc((*maskSize)*sizeof(double));
 	}
@@ -9,7 +9,7 @@ void gaussianD1Convolution2D_loop_1(int *i, int *maskSize, double ** *maskX, dou
 }
 void gaussianD1Convolution2D_loop_2(int *i, Image * *original, double ** *outpicX, double ** *outpicY)
 {
-	for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
+for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
 		(*outpicX)[(*i)] = (double *) malloc((*original)->width*sizeof(double));
 		(*outpicY)[(*i)] = (double *) malloc((*original)->width*sizeof(double));
 	}
@@ -17,14 +17,14 @@ void gaussianD1Convolution2D_loop_2(int *i, Image * *original, double ** *outpic
 }
 void gaussianD1Convolution2D_loop_3(int *i, Image * *outImage)
 {
-	for((*i) = 0; (*i) < (*outImage)->height; ++(*i)) {
+for((*i) = 0; (*i) < (*outImage)->height; ++(*i)) {
 		(*outImage)->pic[(*i)] = (float *) malloc((*outImage)->width*sizeof(float));
 	}
 
 }
 void gaussianD1Convolution2D_loop_4(int *p, int *mr, int *q, double *maskval, double *normalizeFactor, double *sigma, double ** *maskX, int *centY, int *centX, double ** *maskY)
 {
-	for((*p)=-(*mr);(*p)<=(*mr);(*p)++) {
+for((*p)=-(*mr);(*p)<=(*mr);(*p)++) {
            for((*q)=-(*mr);(*q)<=(*mr);(*q)++) {
 	      (*maskval) = -1*(*normalizeFactor)*((*q)/((*sigma)*(*sigma)))*exp(-1*(((*p)*(*p) + (*q)*(*q))/(2*((*sigma)*(*sigma)))));
               (*maskX)[(*p)+(*centY)][(*q)+(*centX)] = (*maskval);
@@ -36,7 +36,7 @@ void gaussianD1Convolution2D_loop_4(int *p, int *mr, int *q, double *maskval, do
 }
 void gaussianD1Convolution2D_loop_5(int *i, int *mr, Image * *original, int *j, double *sum1, double *sum2, int *p, int *q, double ** *maskX, int *centY, int *centX, double ** *maskY, double ** *outpicX, double ** *outpicY)
 {
-        for((*i)=(*mr); (*i) < (*original)->height - (*mr); (*i)++) {
+for((*i)=(*mr); (*i) < (*original)->height - (*mr); (*i)++) {
           for((*j)=(*mr); (*j)< (*original)->width - (*mr); (*j)++) {
              (*sum1) = 0.0;
              (*sum2) = 0.0;
@@ -54,7 +54,7 @@ void gaussianD1Convolution2D_loop_5(int *i, int *mr, Image * *original, int *j, 
 }
 void gaussianD1Convolution2D_loop_6(int *i, Image * *original, int *j, Image * *outImage, int *mr, double ** *outpicX, double ** *outpicY)
 {
-        for((*i) = 0; (*i) < (*original)->height; (*i)++) {
+for((*i) = 0; (*i) < (*original)->height; (*i)++) {
           for((*j) = 0; (*j) < (*original)->width; (*j)++) {
 	  	(*outImage)->pic[(*i)][(*j)] = 0.0f;
 	  	if((*i) >= (*mr) && (*i) < (*original)->height - (*mr) &&
@@ -68,7 +68,7 @@ void gaussianD1Convolution2D_loop_6(int *i, Image * *original, int *j, Image * *
 }
 void gaussianD1Convolution2D_loop_7(int *i, int *maskSize, double ** *maskX, double ** *maskY)
 {
-	for((*i) = 0; (*i) < (*maskSize); ++(*i)) {
+for((*i) = 0; (*i) < (*maskSize); ++(*i)) {
 		free((*maskX)[(*i)]);
 		free((*maskY)[(*i)]);
 	}
@@ -76,7 +76,7 @@ void gaussianD1Convolution2D_loop_7(int *i, int *maskSize, double ** *maskX, dou
 }
 void gaussianD1Convolution2D_loop_8(int *i, Image * *original, double ** *outpicX, double ** *outpicY)
 {
-	for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
+for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
 		free((*outpicX)[(*i)]);
 		free((*outpicY)[(*i)]);
 	}
@@ -84,28 +84,28 @@ void gaussianD1Convolution2D_loop_8(int *i, Image * *original, double ** *outpic
 }
 void gaussianConvolution2D_loop_9(int *i, int *maskSize, double ** *mask)
 {
-	for((*i) = 0; (*i) < (*maskSize); ++(*i)) {
+for((*i) = 0; (*i) < (*maskSize); ++(*i)) {
 		(*mask)[(*i)] = (double *) malloc((*maskSize)*sizeof(double));
 	}
 
 }
 void gaussianConvolution2D_loop_10(int *i, Image * *original, double ** *outpic)
 {
-	for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
+for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
 		(*outpic)[(*i)] = (double *) malloc((*original)->width*sizeof(double));
 	}
 
 }
 void gaussianConvolution2D_loop_11(int *i, Image * *outImage)
 {
-	for((*i) = 0; (*i) < (*outImage)->height; ++(*i)) {
+for((*i) = 0; (*i) < (*outImage)->height; ++(*i)) {
 		(*outImage)->pic[(*i)] = (float *) malloc((*outImage)->width*sizeof(float));
 	}
 
 }
 void gaussianConvolution2D_loop_12(int *p, int *mr, int *q, double *maskval, double *normalizeFactor, double *sigma, double ** *mask, int *centY, int *centX)
 {
-	for((*p)=-(*mr);(*p)<=(*mr);(*p)++) {
+for((*p)=-(*mr);(*p)<=(*mr);(*p)++) {
            for((*q)=-(*mr);(*q)<=(*mr);(*q)++) {
 	      (*maskval) = (*normalizeFactor)*exp(-1*(((*p)*(*p) + (*q)*(*q))/(2*((*sigma)*(*sigma)))));
               (*mask)[(*p)+(*centY)][(*q)+(*centX)] = (*maskval);
@@ -115,7 +115,7 @@ void gaussianConvolution2D_loop_12(int *p, int *mr, int *q, double *maskval, dou
 }
 void gaussianConvolution2D_loop_13(int *i, int *mr, Image * *original, int *j, double *sum, int *p, int *q, double ** *mask, int *centY, int *centX, double ** *outpic)
 {
-        for((*i)=(*mr); (*i) < (*original)->height - (*mr); (*i)++) {
+for((*i)=(*mr); (*i) < (*original)->height - (*mr); (*i)++) {
           for((*j)=(*mr); (*j)< (*original)->width - (*mr); (*j)++) {
              (*sum) = 0.0;
              for ((*p)=-(*mr);(*p)<=(*mr);(*p)++) {
@@ -130,7 +130,7 @@ void gaussianConvolution2D_loop_13(int *i, int *mr, Image * *original, int *j, d
 }
 void gaussianConvolution2D_loop_14(int *i, Image * *original, int *j, Image * *outImage, int *mr, double ** *outpic)
 {
-        for((*i) = 0; (*i) < (*original)->height; (*i)++) {
+for((*i) = 0; (*i) < (*original)->height; (*i)++) {
           for((*j) = 0; (*j) < (*original)->width; (*j)++) {
 	  	(*outImage)->pic[(*i)][(*j)] = 0.0f;
 	  	if((*i) >= (*mr) && (*i) < (*original)->height - (*mr) &&
@@ -143,35 +143,35 @@ void gaussianConvolution2D_loop_14(int *i, Image * *original, int *j, Image * *o
 }
 void gaussianConvolution2D_loop_15(int *i, int *maskSize, double ** *mask)
 {
-	for((*i) = 0; (*i) < (*maskSize); ++(*i)) {
+for((*i) = 0; (*i) < (*maskSize); ++(*i)) {
 		free((*mask)[(*i)]);
 	}
 
 }
 void gaussianConvolution2D_loop_16(int *i, Image * *original, double ** *outpic)
 {
-	for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
+for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
 		free((*outpic)[(*i)]);
 	}
 
 }
 void gaussianConvolution2DFast_loop_17(int *i, Image * *original, double ** *outpicY)
 {
-	for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
+for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
 		(*outpicY)[(*i)] = (double *) malloc((*original)->width*sizeof(double));
 	}
 
 }
 void gaussianConvolution2DFast_loop_18(int *i, Image * *outImage)
 {
-	for((*i) = 0; (*i) < (*outImage)->height; ++(*i)) {
+for((*i) = 0; (*i) < (*outImage)->height; ++(*i)) {
 		(*outImage)->pic[(*i)] = (float *) malloc((*outImage)->width*sizeof(float));
 	}
 
 }
 void gaussianConvolution2DFast_loop_19(int *i, Image * *original, int *j, double ** *outpicY, Image * *outImage)
 {
-	for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
+for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
 		for((*j) = 0; (*j) < (*original)->width; ++(*j)) {
 			(*outpicY)[(*i)][(*j)] = 0.0;
 			(*outImage)->pic[(*i)][(*j)] = 0.0f;
@@ -181,7 +181,7 @@ void gaussianConvolution2DFast_loop_19(int *i, Image * *original, int *j, double
 }
 void gaussianConvolution2DFast_loop_20(int *i, int *maskSize, int *p, int *maskMiddle, double * *mask, double *normalizeFactor, double *sigma)
 {
-	for((*i) = 0; (*i) < (*maskSize); ++(*i)) {
+for((*i) = 0; (*i) < (*maskSize); ++(*i)) {
 		(*p) = (*i) - (*maskMiddle);
 		(*mask)[(*i)] = (*normalizeFactor)*exp(-1*((*p)*(*p))/(2.0*(*sigma)*(*sigma)));
 	}
@@ -189,7 +189,7 @@ void gaussianConvolution2DFast_loop_20(int *i, int *maskSize, int *p, int *maskM
 }
 void gaussianConvolution2DFast_loop_21(int *i, Image * *original, int *j, double *sum, int *isOut, double *outBound, int *p, int *maskSize, int *q, int *maskMiddle, double * *mask, double ** *outpicY)
 {
-	for((*i) = 0; (*i) < (*original)->width; ++(*i)) {
+for((*i) = 0; (*i) < (*original)->width; ++(*i)) {
 		for((*j) = 0; (*j) < (*original)->height; ++(*j)) {
 			(*sum) = 0.0;
 			(*isOut) = 0;
@@ -212,7 +212,7 @@ void gaussianConvolution2DFast_loop_21(int *i, Image * *original, int *j, double
 }
 void gaussianConvolution2DFast_loop_22(int *i, Image * *original, int *j, double *sum, int *isOut, double *outBound, int *p, int *maskSize, int *q, int *maskMiddle, double * *mask, double ** *outpicY, Image * *outImage)
 {
-	for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
+for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
 		for((*j) = 0; (*j) < (*original)->width; ++(*j)) {
 			(*sum) = 0.0;
 			(*isOut) = 0;
@@ -235,7 +235,7 @@ void gaussianConvolution2DFast_loop_22(int *i, Image * *original, int *j, double
 }
 void gaussianConvolution2DFast_loop_23(int *i, Image * *original, double ** *outpicY)
 {
-	for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
+for((*i) = 0; (*i) < (*original)->height; ++(*i)) {
 		free((*outpicY)[(*i)]);
 	}
 

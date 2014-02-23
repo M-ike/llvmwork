@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////
+
 /// COPYRIGHT NOTICE \n
 /// Copyright (c) 2013, 中国科学技术大学(合肥) \n
 /// All rights reserved. \n
@@ -42,6 +42,7 @@ char *itoa(int num);
 void LoopExtractorConsumer::HandleTranslationUnit(ASTContext &Context) {
     //TranslationUnitDecl* D = Context.getTranslationUnitDecl();
     //D->dump(llvm::outs());
+    llvm::outs() << InputFile << "\n";
     std::string InputFileOld = "";
     InputFileOld += InputFile;
     InputFileOld.erase(InputFileOld.find_last_of('.'), InputFileOld.size());
@@ -242,7 +243,7 @@ bool LoopExtractorConsumer::collectMacroPosition(FILE *fp,ASTContext &Context){
                     SourceLocation ESL = MI->getDefinitionEndLoc();
                     int lineStart = SM.getPresumedLoc(ISL).getLine();
                     int lineEnd = SM.getPresumedLoc(ESL).getLine();
-                    llvm::outs() << lineStart << "  "<< lineEnd <<"\n";
+                    //llvm::outs() << lineStart << "  "<< lineEnd <<"\n";
                     int lineCount = 0;
                     rewind(fp);
                     std::string str = getStrBetweenTwoLine(lineStart,lineEnd,lineCount,fp);
@@ -281,7 +282,7 @@ bool LoopExtractorConsumer::collectMacroPosition(FILE *fp,ASTContext &Context){
                         SourceLocation ESL = MI->getDefinitionEndLoc();
                         int lineStart = SM.getPresumedLoc(ISL).getLine();
                         int lineEnd = SM.getPresumedLoc(ESL).getLine();
-                        llvm::outs() << lineStart << "  "<< lineEnd <<"\n";
+                        //llvm::outs() << lineStart << "  "<< lineEnd <<"\n";
                         int lineCount = 0;
                         rewind(fp);
                         std::string str = getStrBetweenTwoLine(lineStart,lineEnd,lineCount,fp);
@@ -320,6 +321,8 @@ bool LoopExtractorConsumer::collectFuncContentAndPosition(FILE *fp,ASTContext &C
         return false;
     }    
     SourceManager &SM = Context.getSourceManager();
+    const LangOptions &Lang = Context.getLangOpts();
+
    
     for(std::vector<FunctionDecl*>::iterator sF = FunctionInSource.begin(),eF = FunctionInSource.end();sF != eF; ++sF){
         FunctionDecl *FD = *sF;
@@ -329,15 +332,55 @@ bool LoopExtractorConsumer::collectFuncContentAndPosition(FILE *fp,ASTContext &C
             return false;
         }
         SourceRange SR = FD->getSourceRange();
+
+        SourceLocation End = SR.getEnd();
+        SourceLocation EndLoc(clang::Lexer::getLocForEndOfToken(End, 0, SM, Lang));
+        bool Invalid = false;
+        const char *Ptr = SM.getCharacterData(EndLoc, &Invalid);
+        int k= 0;
+        while(Ptr[k] != ';'){
+            k++;
+        }
+
+            
         int lineStart = SM.getPresumedLoc(SR.getBegin()).getLine();
         int lineEnd = SM.getPresumedLoc(SR.getEnd()).getLine();
-        FunctionInSourcePosition[lineStart] = lineEnd;
+
+        int colStart = SM.getPresumedLoc(SR.getBegin()).getColumn();
+        int colEnd = SM.getPresumedLoc(EndLoc).getColumn();
+        colEnd += k;
+
+
+        std::pair<int,std::pair<int,std::pair<int,int> > > Position;
+        Position.first = lineStart;
+        Position.second.first = colStart;
+        Position.second.second.first = lineEnd;
+        Position.second.second.second = colEnd;
+        FunctionInSourcePosition.push_back(Position);
+
+        //FunctionInSourcePosition[lineStart] = lineEnd;
         //llvm::outs() << lineStart << "  "<<lineEnd << "\n";
         rewind(fp);
         std::string FunctionContent = "";
-        int lineCount = 0;
+        int lineCount = 1; 
+        int colCount = 0;
+        char ch = ' ';
+        while( (ch = fgetc(fp)) != EOF){
+            colCount++;
+            if(true == isInTwoLocation(lineStart,colStart,lineEnd,colEnd,lineCount,colCount)){
+                FunctionContent += ch;
+                //llvm::outs() << ch;
+            }
+            if(ch == '\n') {
+                lineCount++;
+                colCount = 0;
+            }
+            ch = ' ';
+        }
+        FunctionContent += '\n';
 
-        FunctionContent = getStrBetweenTwoLine(lineStart,lineEnd,lineCount,fp);
+
+        //FunctionContent = getStrBetweenTwoLine(lineStart,lineEnd,lineCount,fp);
         /*char aLine[LINE_SIZE] = { 0 };
         while(NULL != fgets(aLine, sizeof(aLine), fp)) {
             if(++lineCount < lineStart) {
@@ -413,6 +456,7 @@ bool LoopExtractorConsumer::constructRecordDeclContent(FILE *fp, ASTContext &Con
         if(ErrorOutput_LoopExtractAction) llvm::errs() << "传入的文件指针无效.\n";
             return false;
         }
+    const LangOptions &Lang = Context.getLangOpts();
     for(std::vector<Decl*>::iterator sD = DeclToBeDealed.begin(),eD = DeclToBeDealed.end();sD != eD; sD++){
 
         Decl *D = *sD;
@@ -420,19 +464,57 @@ bool LoopExtractorConsumer::constructRecordDeclContent(FILE *fp, ASTContext &Con
         std::string DContent = "";
         SourceManager &SM = Context.getSourceManager();
         SourceRange SR = D->getSourceRange();
+
+        SourceLocation End = SR.getEnd();
+        SourceLocation EndLoc(clang::Lexer::getLocForEndOfToken(End, 0, SM, Lang));
+        bool Invalid = false;
+        const char *Ptr = SM.getCharacterData(EndLoc, &Invalid);
+        int k= 0;
+        while(Ptr[k] != ';'){
+            k++;
+        }
+
         int lineStart = SM.getPresumedLoc(SR.getBegin()).getLine();
-        int lineEnd = SM.getPresumedLoc(SR.getEnd()).getLine();
-        std::map<int, int>::iterator sM1 = DeclToBeDealedPosition.find(lineStart);
+        int lineEnd = SM.getPresumedLoc(EndLoc).getLine();
+        int colStart = SM.getPresumedLoc(SR.getBegin()).getColumn();
+        int colEnd = SM.getPresumedLoc(EndLoc).getColumn();
+        colEnd += k;
+
+        std::pair<int,std::pair<int,std::pair<int,int> > > Position;
+        Position.first = lineStart;
+        Position.second.first = colStart;
+        Position.second.second.first = lineEnd;
+        Position.second.second.second = colEnd;
+        //llvm::outs() << "Decl:"<< lineStart << " " << colStart << " " << lineEnd << " " << colEnd << "\n";
+        /*std::map<int, int>::iterator sM1 = DeclToBeDealedPosition.find(Position);
         if(sM1 != DeclToBeDealedPosition.end()){
             continue;
-        }
+        }*/
         
         DeclToBeDealedAfterDel.push_back(D);
-        DeclToBeDealedPosition[lineStart] = lineEnd;
+        DeclToBeDealedPosition.push_back(Position);
         
-        int lineCount = 0;
-        DContent = getStrBetweenTwoLine(lineStart,lineEnd,lineCount,fp);
+
+        //DContent = getStrBetweenTwoLine(lineStart,lineEnd,lineCount,fp);
+        int lineCount = 1;
+        int colCount = 0;
+        char ch = ' ';
+        while( (ch = fgetc(fp)) != EOF){
+            colCount++;
+            if(true == isInTwoLocation(lineStart,colStart,lineEnd,colEnd,lineCount,colCount)){
+                DContent += ch;
+                //llvm::outs() << ch;
+            }
+            if(ch == '\n') {
+                lineCount++;
+                colCount = 0;
+            }
+            ch = ' ';
+        }
+        DContent += '\n';
+
         DeclContent[D] = DContent;
+        //llvm::outs() << DContent << "\n";
     }
     return true;
 }
@@ -1003,6 +1085,11 @@ bool LoopExtractorConsumer::constructFunctionAndCallProto(ASTContext &ASTC, Func
         if(VD == NULL) break;
         QualType T = VD->getType();
         std::string Type = "";
+        bool isRegister = false;
+        if(VarDecl *vVD=dyn_cast<VarDecl>(VD)){
+            if(vVD->getStorageClass() == SC_Register)
+                isRegister = true;
+        }
         if (ParmVarDecl *Parm = dyn_cast<ParmVarDecl>(VD)) T = Parm->getOriginalType();
         bool isArray = false;
         if(const ArrayType *AT = ASTC.getAsArrayType(T)) {
@@ -1010,11 +1097,19 @@ bool LoopExtractorConsumer::constructFunctionAndCallProto(ASTContext &ASTC, Func
             isArray = true;
         } else Type += T.getAsString();
         std::string Name = VD->getName();
-        FuncPrototype += Type;
-        FuncPrototype += " ";
-        if(false == isArray) FuncPrototype += "*";
-        FuncPrototype += Name;
-        if(true == isArray) FuncPrototype += "[]";
+        if(isRegister){
+            llvm::outs() << Name << "\n";
+            FuncPrototype += Type;
+            FuncPrototype += " *register_";
+            FuncPrototype += Name;
+        }else{
+            FuncPrototype += Type;
+            FuncPrototype += " ";
+            if(false == isArray) FuncPrototype += "*";
+            FuncPrototype += Name;
+            if(true == isArray) FuncPrototype += "[]";
+        }
+
         FuncPrototype += ", ";
     }
 
@@ -1041,6 +1136,35 @@ bool LoopExtractorConsumer::constructFunctionAndCallProto(ASTContext &ASTC, Func
     FunctionProto[FS] = FuncPrototype;
 
     //2.构造调用原型
+    //收集参数中寄存器变量并做处理
+    std::string registerBefore ="";
+    std::string registerend= "";
+    for(std::vector<ValueDecl*>::iterator sVD = sFV->second.begin(),eVD=sFV->second.end();sVD != eVD; ++sVD ){
+        ValueDecl *VD= *sVD;
+        if(NULL == VD) break;
+        if(VarDecl *vVD=dyn_cast<VarDecl>(VD)){
+            if(vVD->getStorageClass() == SC_Register){
+                std::string TypeName = vVD->getType().getAsString();
+                std::string Name = vVD->getName();
+                registerBefore += TypeName;
+                registerBefore += " register_";
+                registerBefore += Name;
+                registerBefore += " = ";
+                registerBefore += Name;
+                registerBefore += ";\n";
+                registerend += "\n";
+                registerend += Name;
+                registerend += " = register_";
+                registerend += Name;
+                registerend += ";\n";
+                
+            }
+        }
+        
+    }
+    //寄存器变量转化为普通变量.
+    CallPrototype += registerBefore;
+
     CallPrototype += FD->getNameInfo().getName().getAsString();
     CallPrototype += "_loop_";
     CallPrototype += std::string(number);
@@ -1048,9 +1172,18 @@ bool LoopExtractorConsumer::constructFunctionAndCallProto(ASTContext &ASTC, Func
     for(std::vector<ValueDecl*>::iterator sVD = sFV->second.begin(), eVD = sFV->second.end(); sVD != eVD; ++sVD) {
         ValueDecl *VD = *sVD;
         if(NULL == VD) break;
+        bool isRegister = false;
+        if(VarDecl *vVD=dyn_cast<VarDecl>(VD)){
+            if(vVD->getStorageClass() == SC_Register)
+                isRegister = true;
+        }
         std::string Name = VD->getName();
         QualType T = VD->getType();
-        if(!ASTC.getAsArrayType(T)) CallPrototype += "&";
+        if(!isRegister){
+            if(!ASTC.getAsArrayType(T)) CallPrototype += "&";
+        }else{
+            if(!ASTC.getAsArrayType(T)) CallPrototype += "&register_";
+        }
         CallPrototype += Name;
         CallPrototype += ", ";
     }
@@ -1073,6 +1206,9 @@ bool LoopExtractorConsumer::constructFunctionAndCallProto(ASTContext &ASTC, Func
     }
 
     CallPrototype += ");";
+    //寄存器变量复制给原来的变量
+    CallPrototype += registerend;
+
     CallProto[FS] = CallPrototype;
 
     LoopCount++;
@@ -1085,6 +1221,35 @@ bool isInQoute(std::map<size_t, size_t> &doublequote,size_t pos){
     for(std::map<size_t,size_t>::iterator sM = doublequote.begin(),eM = doublequote.end();sM!=eM;++sM){
         if(pos > sM->first && pos < sM->second)
             return true;
+    }
+    return false;
+}
+bool isInComment(std::string &ForBody,size_t pos){
+    
+    std::map<size_t, size_t> doublequote;
+    size_t pos1,pos2 = 0; 
+    pos2 = ForBody.find("\"", 0);
+    while(std::string::npos != pos2){
+        pos1 = pos2; 
+        pos2 = ForBody.find("\"", pos2+1);
+        while(ForBody[pos2-1] == '\\')
+            pos2 = ForBody.find("\"", pos2+1);
+        doublequote[pos1] = pos2; 
+        pos2 = ForBody.find("\"", pos2+1);
+    }
+
+    size_t comEndpos = ForBody.find("*/",pos);
+    size_t comBeginpos = ForBody.find("/*",pos);
+
+    if(comEndpos != std::string::npos && comBeginpos == std::string::npos){ 
+        if(isInQoute(doublequote,comEndpos) == false)
+            return true;
+    }
+    if(comEndpos != std::string::npos && comBeginpos != std::string::npos) {
+        if(comEndpos < comBeginpos){
+           if(isInQoute(doublequote,comEndpos) == false)
+            return true;
+        }
     }
     return false;
 }
@@ -1111,6 +1276,14 @@ bool LoopExtractorConsumer::constructFunction(FILE *fp, ASTContext &context, Fun
     for(std::vector<ValueDecl*>::iterator sVD = sFV->second.begin(), eVD = sFV->second.end(); sVD != eVD; ++sVD) {
         ValueDecl *VD = *sVD;
         if(NULL == VD) break;
+        //如果输入参数是register类型的变量,则跳过.
+         bool isRegister = false;
+         if(VarDecl *vVD = dyn_cast<VarDecl>(VD)) {
+            if( vVD->getStorageClass() == SC_Register ){
+                isRegister = true;
+            }
+        }
+
         QualType T = VD->getType();
         if(context.getAsArrayType(T)) continue;
         doublequote.clear();
@@ -1150,6 +1323,9 @@ bool LoopExtractorConsumer::constructFunction(FILE *fp, ASTContext &context, Fun
                continue;                  
             }
             std::string re = "(*";
+            //当替换的是寄存器变量时,加前缀register_.
+            if(isRegister) re += "register_";
+
             re += name;
             re += ")";
             ForBody.replace(pos, size, re.c_str());
@@ -1173,7 +1349,12 @@ bool LoopExtractorConsumer::constructFunction(FILE *fp, ASTContext &context, Fun
     }
 
     if(ReturnInLoop.size() != 0) {
+
         size_t pos = ForBody.find("return", 0);
+        while(isInComment(ForBody,pos) == true ){
+            pos = ForBody.find("return",pos+6);
+        }
+
         while(isalpha(ForBody[pos - 1]) || isdigit(ForBody[pos - 1]) || ForBody[pos - 1] == '_' || \
             isalpha(ForBody[pos + 6]) || isdigit(ForBody[pos + 6]) || ForBody[pos + 6] == '_') {
             pos += 6;
@@ -1227,6 +1408,10 @@ bool LoopExtractorConsumer::constructFunction(FILE *fp, ASTContext &context, Fun
             ForBody.replace(pos, pos_end - pos + 1, rep.c_str());
             pos += rep.size();
             pos = ForBody.find("return", pos);
+            while(isInComment(ForBody,pos) == true ){
+                pos = ForBody.find("return",pos+6);
+            }
+
             while(isalpha(ForBody[pos - 1]) || isdigit(ForBody[pos - 1]) || ForBody[pos - 1] == '_' || \
                   isalpha(ForBody[pos + 6]) || isdigit(ForBody[pos + 6]) || ForBody[pos + 6] == '_') {
                 pos += 6;
@@ -1322,9 +1507,35 @@ bool LoopExtractorConsumer::writeHeaderFile(FILE *fp, raw_ostream &O, std::strin
     else O << header << "\n";
     //写结构体
     rewind(fp);
-    int lineCount = 0;
+    int lineCount = 1;
     char aLine[LINE_SIZE] = {0};
-    while(NULL != fgets(aLine, sizeof(aLine), fp)){
+    int colCount = 0;
+    char ch = ' ';
+    //std::string temp = "";
+    int IN = 0;
+    while((ch = fgetc(fp)) != EOF){
+        colCount++;
+        std::map<int,std::string>::iterator sM = MacroContentInFile.find(lineCount);
+        if(sM != MacroContentInFile.end()){
+            O << sM->second << "\n";
+            lineCount++;
+        }
+
+        if(true == isInLocationVector(DeclToBeDealedPosition,lineCount,colCount,IN)){
+            O << ch;
+            if(IN == 0 ){
+                O << "\n";
+            }
+        }
+        if(ch == '\n'){
+            //llvm::outs() << lineCount << "\n";
+            colCount = 0;
+            lineCount++; 
+        }
+
+    }
+
+    /*while(NULL != fgets(aLine, sizeof(aLine), fp)){
         lineCount++;
         std::map<int,int>::iterator sM = DeclToBeDealedPosition.find(lineCount);
         if(sM != DeclToBeDealedPosition.end()){
@@ -1335,7 +1546,7 @@ bool LoopExtractorConsumer::writeHeaderFile(FILE *fp, raw_ostream &O, std::strin
                  if(lineCount == sM->second){
                     std::string str = "";
                     str += aLine;
-                    size_t pos = str.find("/*");
+                    size_t pos = str.find("/ *");
                     if(pos != std::string::npos)
                         str.erase(str.begin() + pos,str.end());
                     O << str;
@@ -1344,7 +1555,7 @@ bool LoopExtractorConsumer::writeHeaderFile(FILE *fp, raw_ostream &O, std::strin
                  }
             }
         }
-    }
+    }*/
 
     /*for(llvm::DenseMap<Decl*, std::string>::iterator sDR = DeclContent.begin(),eDR = DeclContent.end();sDR != eDR;++sDR ){
         std::string DContent = sDR->second;
@@ -1408,6 +1619,24 @@ bool LoopExtractorConsumer::writeNewSourceFile(FILE *fp, raw_ostream &O, std::st
     }*/
     return true;
 }
+static void addString(char *str, std::string *header, FILE* fp) {
+    header->append(std::string(str));
+    int i;
+    char aLine[LINE_SIZE] = { 0 };
+    while(1) {
+        i=0;
+        while(str[i] !='\0') i++;
+        if(str[i - 2] == '\\') {   
+            memset(aLine, 0, sizeof(aLine));
+            if(NULL != fgets(aLine, sizeof(aLine), fp)) {
+                header->append(aLine);
+                str = aLine;
+            }
+        } else break;
+    }
+
+    return;
+}
 
 static void delString(char *str, int *lineCount, FILE* fp) {
     int i;
@@ -1439,101 +1668,12 @@ bool LoopExtractorConsumer::writeSourceFile(FILE *fp, raw_ostream &O, std::strin
         return false;
     }
     
-    /*rewind(fp);
-    char aLine[LINE_SIZE] = { 0 };
-    int lineCount = 0;
-    std::string temp = "";
-    while(NULL != fgets(aLine, sizeof(aLine), fp)){
-        lineCount++;
-        std::map<int, int>::iterator sM1 = FunctionInSourcePosition.find(lineCount);
-
-        if(sM1 != FunctionInSourcePosition.end()){
-            //当是函数的最后一行时,出现"/ *",处理注释
-            if(lineCount == sM1->second) {
-                std::string str = "";
-                str += aLine;
-                size_t pos = str.find("/ *");
-                if(pos != std::string::npos){
-                    //llvm::outs() << aLine << "  " << str << "\n";
-                    str.erase(str.begin()+pos,str.end());
-                    O << str;
-                }
-            }
-            O << aLine;
-            while(lineCount < sM1->second) {
-                fgets(aLine, sizeof(aLine), fp);
-                lineCount++;
-                std::map<int, int>::iterator sM = LoopPosition.find(lineCount);
-                //std::map<int, int>::iterator sM1 = DeclToBeDealedPosition.find(lineCount);
-   
-                if(sM != LoopPosition.end()) {
-                    std::map<int, ForStmt*>::iterator sF = ForPosition.find(lineCount);
-                    if(sF == ForPosition.end()) return false;
-                    ForStmt *FS = sF->second;
-                    llvm::DenseMap<ForStmt*, FunctionDecl*>::iterator sDM = ReturnInFile.find(FS);
-                    llvm::DenseMap<ForStmt*, std::string>::iterator sFS = CallProto.find(FS);
-                    if(sFS != CallProto.end()) {
-                        std::string callStmt = sFS->second;
-                        int pos = callStmt.find("_loop_", 0);
-                        std::string cN = "";
-                        int i = 0, temp_pos = pos;
-                        temp_pos += 6;
-                        char temp = callStmt.at(temp_pos);
-                        while(temp != '(') {
-                            cN += temp;
-                            i++; temp_pos++;
-                            temp = callStmt.at(temp_pos);
-                        }
-
-                        if(sDM != ReturnInFile.end()) { 
-                            O << "\t{ int re_arg_pa1_" << cN << " = -1; "; 
-                            FunctionDecl *FD = sDM->second;
-                            if(!FD->getResultType()->isVoidType()) {
-                                O << FD->getResultType().getAsString() << " re_arg_pa2_" << cN << ";";
-                            }
-                        }
-
-                        O<< "\n";
-                        O << "    " << callStmt << "\n";
-                        if(sDM != ReturnInFile.end()) {
-                            O << "\tif(re_arg_pa1_" << cN << " != -1)";
-                            FunctionDecl *FD = sDM->second;
-                            if(NULL == FD) return false;
-                            if(FD->getResultType()->isVoidType()) O << " return; }\n";
-                            else O << " return re_arg_pa2_" << cN << "; }\n";
-                        }
-                    } else return false;
-                    //删除for
-                    while(lineCount < sM->second) {
-                        fgets(aLine, sizeof(aLine), fp);
-                        lineCount++;
-                    }
-                    //处理for最后一行注释
-                    if(lineCount == sM->second) {
-                        std::string str = "";
-                        str += aLine;
-                        size_t pos = str.find("/ *");
-                        if(pos != std::string::npos){
-                            str.erase(str.begin(),str.begin() + pos);
-                            O << str;
-                        }
-                    }
-                        
-
-                    LoopPosition.erase(sM);
-                }
-                if(sM == LoopPosition.end()){               
-                    O << aLine;
-                }
-                memset(aLine, 0, sizeof(aLine));
-            }
-        }
-    }*/
                    
     rewind(fp);    
     char aLine[LINE_SIZE] = { 0 };
     int lineCount = 0;
     bool skip = false;
+    int headerLineEnd = 0; 
     while(NULL != fgets(aLine, sizeof(aLine), fp)) {
         lineCount++;
         int i = 0;
@@ -1541,31 +1681,42 @@ bool LoopExtractorConsumer::writeSourceFile(FILE *fp, raw_ostream &O, std::strin
         int j= 0;
         char *str = aLine;
         std::string temp = "";
+        std::string ifContent = "";
         while(str[i] == ' ') { i++; }//消除空格
         if(false == skip) {
             //判断以#开头的
             if(str[i] == '#') {
                 if(temp.assign(str+i+1,2)=="if") {
+                    int flags = 0; //标志着在这if...后面是否是条件编译.
                     ifcount++;
-                    delString(str, &lineCount, fp);
+                    delString(str, &lineCount,fp);
                     while(ifcount > 0) {
                         memset(aLine, 0, sizeof(aLine));
                         fgets(aLine, sizeof(aLine), fp);
                         lineCount++;
                         str = aLine; i = 0;
-                        while(*str == ' ') { str++; i++; }
-                        if(temp.assign(str+i,3)=="#if") ifcount++;
-                        if(temp.assign(str+i,6)=="#endif") ifcount--;
+                        while(str[i] == ' ') { i++; }
+                        if(str[i] == '#'){
+                            if(temp.assign(str+i,3)=="#if") ifcount++;
+                            if(temp.assign(str+i,6)=="#endif") ifcount--;
+                        }else{
+                            flags = 1;
+                        }
                         delString(str, &lineCount, fp);
                     }
+                    if(flags == 1) {
+                        skip = true;
+                    }else{
+                        headerLineEnd = lineCount;
+                    }
+
                 //其他情况，如#include、#define、#undef.
-                } else delString(str, &lineCount, fp);
+                } else{ 
+                    delString(str, &lineCount, fp);
+                    headerLineEnd = lineCount;
+                }
                     continue;
-                //if(temp.assign(str+i+1,7)=="include") {
-                  //  delString(str, &lineCount, fp);
-                   // continue;
-                //}
-            } else if(temp.assign(str+i,2) == "//") continue;
+            } else if(temp.assign(str+i,2) == "//") {headerLineEnd++;continue;}
             else if(temp.assign(str+i,2) == "/*") { //处理注释
                 while(1) {
                     str = aLine;
@@ -1576,14 +1727,126 @@ bool LoopExtractorConsumer::writeSourceFile(FILE *fp, raw_ostream &O, std::strin
                     fgets(aLine, sizeof(aLine), fp);
                     lineCount++;
                 }
-
+                headerLineEnd = lineCount;
                 continue;
-            } else if(*str == '\n' || *str == '\r') continue;
+            } else if(*str == '\n' || *str == '\r') {headerLineEnd++;continue;}
             
+        }else{ break; }
+            
+        skip = true;
+    }
+
+    //写入后的内容,只包含原函数部分,其他部分放到了头文件中.
+    rewind(fp);
+    lineCount = 0;
+    //首先跳过文件的头部.
+    if(NULL !=fgets(aLine,sizeof(aLine),fp)){    
+        while(++lineCount < headerLineEnd ){
+            fgets(aLine, sizeof(aLine), fp);
         }
-            skip = true;
-       
-       
+    }
+
+    lineCount = headerLineEnd + 1;
+    int colCount = 0;
+    char ch = ' ';
+    char temp = '\0';
+    //std::string temp = "";
+    int IN = 0;
+    int IN2 = 0;
+    while((ch = fgetc(fp)) != EOF){
+        colCount++;
+        //llvm::outs() << ch << lineCount << colCount;
+        /*if(false == isInLocationVector(DeclToBeDealedPosition,lineCount,colCount,IN)){
+            O << ch;
+        }
+        if(ch == '\n'){
+            colCount = 0;
+            lineCount++;
+        }*/
+        bool b1=isInLocationVector(DeclToBeDealedPosition,lineCount,colCount,IN);
+        bool b2=isInLocationVector(LoopPosition,lineCount,colCount,IN2); 
+        if(!b1 && !b2){
+            O << ch;
+            if(ch == '\n'){
+                //llvm::outs() << lineCount << "\n";
+                colCount = 0;
+                lineCount++; 
+            }
+
+            continue;
+        }
+        if( b1 && !b2 ){
+            if(IN == 0 ){
+                O << "\n";
+            }
+        }
+        if( !b1 && b2){
+            if(IN2 == 0){
+                O << "\n";
+            } 
+            std::map<int, ForStmt*>::iterator sF = ForPosition.find(lineCount);
+            if(sF == ForPosition.end()) return false;
+            ForStmt *FS = sF->second;
+            llvm::DenseMap<ForStmt*, FunctionDecl*>::iterator sDM = ReturnInFile.find(FS);
+            llvm::DenseMap<ForStmt*, std::string>::iterator sFS = CallProto.find(FS);
+            if(sFS != CallProto.end()) {
+                std::string callStmt = sFS->second;
+                int pos = callStmt.find("_loop_", 0);
+                std::string cN = "";
+                int i = 0, temp_pos = pos;
+                    temp_pos += 6;
+                    char temp = callStmt.at(temp_pos);
+                    while(temp != '(') {
+                        cN += temp;
+                        i++; temp_pos++;
+                        temp = callStmt.at(temp_pos);
+                    }
+
+                    if(sDM != ReturnInFile.end()) { 
+                        O << "\t{ int re_arg_pa1_" << cN << " = -1; "; 
+                        FunctionDecl *FD = sDM->second;
+                        if(!FD->getResultType()->isVoidType()) {
+                            O << FD->getResultType().getAsString() << " re_arg_pa2_" << cN << ";";
+                        }
+                    }
+
+                    O<< "\n";
+                    O << "    " << callStmt << "\n";
+                    if(sDM != ReturnInFile.end()) {
+                        O << "\tif(re_arg_pa1_" << cN << " != -1)";
+                        FunctionDecl *FD = sDM->second;
+                        if(NULL == FD) return false;
+                        if(FD->getResultType()->isVoidType()) O << " return; }\n";
+                        else O << " return re_arg_pa2_" << cN << "; }\n";
+                    }
+                } else return false;
+                //删除循环.
+                while(true ==  isInLocationVector(LoopPosition,lineCount,colCount,IN)){
+                    if(ch == '\n'){
+                        lineCount++;
+                        colCount = 1;
+                    }
+                    ch = fgetc(fp);
+                    colCount++;
+                    if(ch == EOF) break;
+                }
+
+
+        }
+        if(ch == '\n'){
+            //llvm::outs() << lineCount << "\n";
+            colCount = 0;
+            lineCount++; 
+        }
+
+            
+    }
+    /*rewind(fp);
+    lineCount=0;
+    while(NULL != fgets(aLine, sizeof(aLine), fp)) {
+        while(++lineCount <= headerLineEnd ){
+            fgets(aLine, sizeof(aLine), fp);
+        }
         //处理循环
         std::map<int, int>::iterator sM = LoopPosition.find(lineCount);
         std::map<int, int>::iterator sM1 = DeclToBeDealedPosition.find(lineCount);
@@ -1633,7 +1896,7 @@ bool LoopExtractorConsumer::writeSourceFile(FILE *fp, raw_ostream &O, std::strin
             if(lineCount == sM->second) {
                 std::string str = "";
                 str += aLine;
-                size_t pos = str.find("/*");
+                size_t pos = str.find("/ *");
                 if(pos != std::string::npos){
                     str.erase(str.begin(),str.begin()+pos);
                     O << str;
@@ -1650,7 +1913,7 @@ bool LoopExtractorConsumer::writeSourceFile(FILE *fp, raw_ostream &O, std::strin
             if(lineCount == sM1->second) {
                 std::string str = "";
                 str += aLine;
-                size_t pos = str.find("/*");
+                size_t pos = str.find("/ *");
                 if(pos != std::string::npos){
                     str.erase(str.begin(),str.begin()+pos);
                     O << str;
@@ -1664,33 +1927,17 @@ bool LoopExtractorConsumer::writeSourceFile(FILE *fp, raw_ostream &O, std::strin
         }
         
         memset(aLine, 0, sizeof(aLine));
-    }
+    }*/
+    llvm::outs() << "headerLineEnd "<<headerLineEnd << "\n";
 
     return true;
 }
 
-static void addString(char *str, std::string *header, FILE* fp) {
-    header->append(std::string(str));
-    int i;
-    char aLine[LINE_SIZE] = { 0 };
-    while(1) {
-        i=0;
-        while(str[i] !='\0') i++;
-        if(str[i - 2] == '\\') {   
-            memset(aLine, 0, sizeof(aLine));
-            if(NULL != fgets(aLine, sizeof(aLine), fp)) {
-                header->append(aLine);
-                str = aLine;
-            }
-        } else break;
-    }
-
-    return;
-}
 
 std::string LoopExtractorConsumer::getHeader(FILE *fp) {
     std::string header = "";
     std::string temp = "";
+    std::string ifContent = "";//临时存放#if..#end的内容.
     if(fp == NULL) {
         if(ErrorOutput_LoopExtractAction) llvm::errs() << "传入的文件指针无效.\n";
         return "";
@@ -1731,17 +1978,28 @@ std::string LoopExtractorConsumer::getHeader(FILE *fp) {
         //判断以#开头的
         if(str[i] == '#') {
             if(temp.assign(str+i+1,2)=="if") {
+                int flags = 0;//flags标志着在if...后面是条件编译.
                 ifcount++;
-                addString(str, &header, fp);
+                addString(str, &ifContent, fp);
                 while(ifcount > 0) {
                     memset(aLine, 0, sizeof(aLine));
                     fgets(aLine, sizeof(aLine), fp);
                     str = aLine; i = 0;
-                    while(*str == ' ') { str++; i++; }
-                    if(temp.assign(str+i,3)=="#if") ifcount++;
-                    if(temp.assign(str+i,6)=="#endif") ifcount--;
-                    addString(str, &header, fp);
+                    while(str[i] == ' ') { i++; }
+                    if(str[i] == '#'){
+                        if(temp.assign(str+i,3)=="#if") ifcount++;
+                        if(temp.assign(str+i,6)=="#endif") ifcount--;
+                    }else{
+                        flags = 1;
+                        break;
                     }
+                    addString(str, &ifContent, fp);
+                }
+                if(flags == 0){
+                    header += ifContent;
+                }else{
+                    break;
+                }
             //其他情况，如#include、#define、#undef.
             } else addString(str, &header, fp);
         } else if(temp.assign(str+i,2) == "//") addString(str, &header, fp);
@@ -1768,23 +2026,74 @@ std::string LoopExtractorConsumer::getHeader(FILE *fp) {
 
 std::string LoopExtractorConsumer::getForStmt(FILE *fp, ForStmt *FS, ASTContext &context) {
     SourceRange SR = FS->getSourceRange();
+    //Stmt *ForBody = FS->getBody(); 
     std::string forStmt = "";
     if(fp == NULL) {
         if(ErrorOutput_LoopExtractAction) llvm::errs() << "传入的文件指针无效.\n";
         return "";
     }
+    const LangOptions &Lang = context.getLangOpts();
     
     rewind(fp);
     SourceManager &SM = context.getSourceManager();
+    SourceLocation End = SR.getEnd();
+   // SourceLocation EndLoc(clang::Lexer::getLocForEndOfToken(End, 1, SM, Lang));
+
+
+    const std::pair<SourceLocation,SourceLocation> ExpansionLoc(SM.getExpansionRange(End));
+    const SourceLocation Ebegin = ExpansionLoc.first; 
+    const SourceLocation EEnd = ExpansionLoc.second;
+  
+    
+    SourceLocation EndLoc(clang::Lexer::getLocForEndOfToken(EEnd, 1, SM, Lang));
+
+    llvm::outs() << "Expansion:"<< SM.getPresumedLoc(EndLoc).getColumn() << " " << SM.getPresumedLoc(EndLoc).getColumn()<< "\n"; 
+    bool Invalid = false;
+    const char *EEndptr = SM.getCharacterData(EndLoc,&Invalid);
+    llvm::outs() << EEndptr[-1] <<EEndptr[0] << EEndptr[1] << EEndptr[2] <<"\n";
+   
     int lineStart = SM.getPresumedLoc(SR.getBegin()).getLine();
-    int lineEnd = SM.getPresumedLoc(SR.getEnd()).getLine();
+    int lineEnd = SM.getPresumedLoc(EndLoc).getLine();
+    int colStart = SM.getPresumedLoc(SR.getBegin()).getColumn();
+    int colEnd = SM.getPresumedLoc(EndLoc).getColumn();
 
-    LoopPosition[lineStart] = lineEnd;
+
+    if(EEndptr[0] != '}'){
+        int k= 0;
+        while(EEndptr[k] != ';'){
+            k++;
+        }
+        colEnd += k;
+    }
+
+
+    std::pair<int,std::pair<int,std::pair<int,int> > > Position;
+    Position.first = lineStart;
+    Position.second.first = colStart;
+    Position.second.second.first = lineEnd;
+    Position.second.second.second = colEnd;
+    LoopPosition.push_back(Position);
     ForPosition[lineStart] = FS;
+    llvm::outs() << "For:"<< lineStart << " " << colStart << " " << lineEnd << " " << colEnd << "\n";
+    int lineCount = 1;
+    int colCount = 0;
+    char ch = ' ';
+    while( (ch = fgetc(fp)) != EOF){
+        colCount++;
+        if(true == isInTwoLocation(lineStart,colStart,lineEnd,colEnd,lineCount,colCount)){
+            forStmt += ch;
+        }
+        if(ch == '\n') {
+            lineCount++;
+            colCount = 0;
+        }
+        ch = ' ';
+    }
+    forStmt += '\n';
+   // llvm::outs() << forStmt << "\n";
 
-    int lineCount = 0;
 
-    forStmt = getStrBetweenTwoLine(lineStart,lineEnd,lineCount,fp);
+    //forStmt = getStrBetweenTwoLine(lineStart,lineEnd,lineCount,fp);
     /*char aLine[LINE_SIZE] = { 0 };
     while(NULL != fgets(aLine, sizeof(aLine), fp)) {
         if(++lineCount < lineStart) {
@@ -1899,6 +2208,7 @@ std::string LoopExtractorConsumer::getStrBetweenTwoLine(int lineStart,int lineEn
             if(pos != std::string::npos)
                 str.erase(str.begin() + pos,str.end());
             StringBetweenTwoLine += str;
+            StringBetweenTwoLine +="\n";
         }else{
             StringBetweenTwoLine += aLine;
         }
@@ -1906,3 +2216,62 @@ std::string LoopExtractorConsumer::getStrBetweenTwoLine(int lineStart,int lineEn
     }
     return StringBetweenTwoLine;
 }
+
+bool LoopExtractorConsumer::isInTwoLocation(int lineStart,int colStart,int lineEnd,int colEnd ,int lineCount,int colCount){
+    if(lineCount == lineStart){
+        if(lineCount == lineEnd){
+            if(colCount >=colStart && colCount <=colEnd)
+                return true;
+        }else{
+            if(colCount >= colStart){
+                return true;
+            }
+        }
+    }else if(lineCount == lineEnd && colCount <= colEnd){
+        return true;
+                                              
+    }else if(lineCount > lineStart && lineCount < lineEnd){
+            return true;
+                                                                        
+   }
+                                                                              
+
+    return false;
+}
+bool LoopExtractorConsumer::isInLocationVector(std::vector< std::pair<int,std::pair<int,std::pair<int, int> > > > Position,
+                                            int lineCount,int colCount,int &IN){
+        for(std::vector<std::pair<int,std::pair<int,std::pair<int, int> > > >::iterator sP = Position.begin(),\
+                                                                             eP = Position.end();sP!=eP;++sP){
+            std::pair<int,std::pair<int,std::pair<int, int> > > SP = *sP;
+            int lineStart = SP.first;
+            //llvm::outs() << " atuo x: " << x.first << "\n";
+            int colStart = SP.second.first;
+            int lineEnd = SP.second.second.first;
+            int colEnd = SP.second.second.second; 
+            if(lineStart == lineCount && colStart == colCount){
+                IN = 1; //表示在入口
+                break;
+            }else if(lineEnd == lineCount && colEnd == colCount){
+                IN = 0; //表示在出口
+                break;
+            } else {
+                IN = 2; //表示不在出口和入口
+            }
+        }
+    
+    for(std::vector<std::pair<int,std::pair<int,std::pair<int, int> > > >::iterator sP = Position.begin(),\
+                                                                 eP = Position.end();sP!=eP;++sP){
+        std::pair<int,std::pair<int,std::pair<int, int> > > SP = *sP;
+        int lineStart = SP.first;
+        //llvm::outs() << " atuo x: " << x.first << "\n";
+        int colStart = SP.second.first;
+        int lineEnd = SP.second.second.first;
+        int colEnd = SP.second.second.second;
+        if(isInTwoLocation(lineStart,colStart,lineEnd,colEnd,lineCount,colCount))
+             return true;
+        }
+
+
+    return false;
+}
+

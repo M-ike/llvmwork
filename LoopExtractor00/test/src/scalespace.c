@@ -21,11 +21,13 @@ ScaleSpace *buildScaleSpaceOctave(Image *original, double imgScale, double image
 
 	k = pow(2.0, (double) (1.0/(IMAGES_PER_OCTAVE-1)));
 	sigma = START_SIGMA;
-
+	
     buildScaleSpaceOctave_loop_1(&i, &space, &sigma, &k);
 
 
+	
     buildScaleSpaceOctave_loop_2(&i, &space, &sourceBlur, &imageSigma, &targetBlur, &original, &sigma);
+
 	space->imgHeight = original->height;
 	space->imgWidth = original->width;
 	space->processedLocalization = NULL;
@@ -49,14 +51,17 @@ ScaleSpace *buildDifferences(ScaleSpace *original) {
 	space->images = (Image **) malloc(space->imageCount*sizeof(Image *));
 	if(space->images == NULL)
 		return NULL;
-
+	
     buildDifferences_loop_3(&i, &space, &original);
 
-	space->processedLocalization = (int **) malloc(space->imgHeight*sizeof(int *));
 
+	space->processedLocalization = (int **) malloc(space->imgHeight*sizeof(int *));
+	
     buildDifferences_loop_4(&i, &space);
 
+	
     buildDifferences_loop_5(&i, &space, &j);
+
 	return space;
 }
 
@@ -77,8 +82,9 @@ ScaleSpace *buildScaleSpaceEdges(ScaleSpace *original) {
 	space->images = (Image **) malloc(space->imageCount*sizeof(Image *));
 	if(space->images == NULL)
 		return NULL;
-
+	
     buildScaleSpaceEdges_loop_6(&i, &space, &original);
+
 
 	return space;
 }
@@ -99,8 +105,9 @@ ScaleSpace *buildScaleSpaceCanny(ScaleSpace *gaussian, ScaleSpace *derivative) {
 	space->images = (Image **) malloc(space->imageCount*sizeof(Image *));
 	if(space->images == NULL)
 		return NULL;
-
+	
     buildScaleSpaceCanny_loop_7(&i, &space, &derivative, &gaussian);
+
 
 	return space;
 }
@@ -125,8 +132,9 @@ KeyPoint *findPeaks(ScaleSpace *this, Image *current, Image *above, Image *below
 	int   isMax;
 
 	/* check if minimum or maximum */
-
+	
     findPeaks_loop_8(&i, &current, &j, &min, &isMin, &p, &q, &above, &below, &temp, &DoGlevel, &this, &peaks, &max, &isMax);
+
 	return peaks;
 }
 
@@ -195,18 +203,21 @@ void printHistogram(ScaleSpace *this, KeyPoint *point) {
 	oneBinRad = (2.0*M_PI) / 36.0;
 
 	/* build the histogram */
-
+	
     printHistogram_loop_9(&y, &yMin, &yMax, &x, &xMin, &xMax, &relativeX, &point, &relativeY, &radius, &yDiff, &this, &xDiff, &direction, &binIndex, &oneBinRad, &magnitude, bins, &sigma);
+
 
 	/* find maximum peak for histogram output */
 	maxGradient = 0.0;
-
+	
     printHistogram_loop_10(&binIndex, bins, &maxGradient);
+
 
 	/* output histogram */
 	fprintf(histOutput2, "Pt. %d %d, Level %d\n", (int) (point->y), (int) (point->x), point->imageLevel);
-
+	
     printHistogram_loop_11(&binIndex, &barWidth, bins, &maxGradient, &i);
+
 	fprintf(histOutput2, "\n");
 }
 
@@ -227,8 +238,9 @@ void getMagnitudesAndOrientations(ScaleSpace *this) {
 	width = this->imgWidth;
 	height = this->imgHeight;
 	imageLevels = this->imageCount - 2;
-
+	
     getMagnitudesAndOrientations_loop_12(&i, &height, &j, &width, &k, &imageLevels, &xDiff, &this, &yDiff);
+
 }
 
 double ***allocate3D(int height, int width, int depth) {
@@ -241,10 +253,12 @@ double ***allocate3D(int height, int width, int depth) {
 		printf("malloc returned null\n");
 		exit(1);
 	}
-
+	
     allocate3D_loop_13(&i, &height, &matrix, &width);
 
+	
     allocate3D_loop_14(&i, &height, &j, &width, &matrix, &depth);
+
 	return matrix;
 }
 
@@ -252,8 +266,9 @@ void deallocate3D(double ***matrix, int height, int width) {
 
 	int i, j;
 
-
+	
     deallocate3D_loop_15(&i, &height, &j, &width, &matrix);
+
 	free(matrix);
 }
 
@@ -262,8 +277,9 @@ KeyPoint *generateKeypoints(ScaleSpace *this, KeyPoint *peaks) {
 	KeyPoint *current;
 	int      multipleKeypoints = 0;
 
-
+	
     generateKeypoints_loop_16(&current, &peaks, &this, &multipleKeypoints);
+
 	printf("      added %d keypoints with new orientation\n", multipleKeypoints);
 	return peaks;
 }
@@ -300,13 +316,15 @@ KeyPoint *generateKeypointSingle(ScaleSpace *this, KeyPoint *list, KeyPoint *poi
 	oneBinRad = (2.0*M_PI) / 36.0;
 
 	/* build the histogram */
-
+	
     generateKeypointSingle_loop_17(&y, &yMin, &yMax, &x, &xMin, &xMax, &relativeX, &point, &relativeY, &radius, &this, &oneBinRad, bins, &sigma);
+
 
 	/* find maximum peak for histogram output */
 	maxGradient = 0.0;
-
+	
     generateKeypointSingle_loop_18(&binIndex, bins, &maxGradient);
+
 
 	/* output histogram -- only informational
 	fprintf(histOutput, "Pt. %d %d, Level %d\n", (int) (point->y*this->imageScale), (int) (point->x*this->imageScale), point->imageLevel);
@@ -338,8 +356,9 @@ KeyPoint *generateKeypointSingle(ScaleSpace *this, KeyPoint *list, KeyPoint *poi
 	/* find bin with maximum peak */
 	maxGradient = 0.0;
 	maxBin = 0;
-
+	
     generateKeypointSingle_loop_19(&binIndex, bins, &maxGradient, &maxBin);
+
 
 	/* output histogram  -- only informational
 	fprintf(histOutput, "Pt. %d %d, Level %d (after smoothing)\n", (int) (point->y*this->imageScale), (int) (point->x*this->imageScale), point->imageLevel);
@@ -363,11 +382,13 @@ KeyPoint *generateKeypointSingle(ScaleSpace *this, KeyPoint *list, KeyPoint *poi
 	}
 
 	/* find other keypoints */
-
+	
     generateKeypointSingle_loop_20(&binIndex, &maxBin, isKeypoint, bins, &maxGradient, &left, &right);
 
 
+	
     generateKeypointSingle_loop_21(&binIndex, isKeypoint, &left, &right, bins, &maxDegreeCorrection, &maxGradient, &degree, &oneBinRad, &point, &extraCount, &newKey, &lastAddition, &list);
+
 
 	if(newKey == NULL) {
 		return point;
@@ -435,8 +456,9 @@ void createDescriptors(ScaleSpace *this, KeyPoint *list) {
 	radius = descriptorDim*2; //really, (width=descriptorDim*4)/2
 	dirSpacing = (2.0*M_PI)/directionCount;
 	xySpacing = 4.0; //each descriptor bin covers 4x4 pixel area
-
+	
     createDescriptors_loop_22(&current, &list, &angle, &descriptorDim, &directionCount, &y, &radius, &x, &imageX, &imageY, &this, &yR, &xR, &dir, &i, &j, &k, &magnitudeWeight, &sigma, &iy, &ix, &id, &binX, &binY, &binDir, &xDist, &xySpacing, &yDist, &dirDist, &dirSpacing);
+ //end keypoint traversal loop
 }
 
 float ***allocateFeatureVector(int descriptorDim, int directionCount) {
@@ -449,14 +471,17 @@ float ***allocateFeatureVector(int descriptorDim, int directionCount) {
 		printf("malloc returned null\n");
 		exit(1);
 	}
-
+	
     allocateFeatureVector_loop_23(&i, &descriptorDim, &matrix);
 
+	
     allocateFeatureVector_loop_24(&i, &descriptorDim, &j, &matrix, &directionCount);
 
-	/* initialize */
 
+	/* initialize */
+	
     allocateFeatureVector_loop_25(&i, &descriptorDim, &j, &k, &directionCount, &matrix);
+
 	return matrix;
 }
 
@@ -467,23 +492,28 @@ void capAndNormalizeFV(KeyPoint *this) {
 
 	/* normalize to unit length */
 	norm = 0.0;
-
+	
     capAndNormalizeFV_loop_26(&i, &this, &j, &k, &norm);
-	norm = sqrt(norm);
 
+	norm = sqrt(norm);
+	
     capAndNormalizeFV_loop_27(&i, &this, &j, &k, &norm);
 
-	/* cap */
 
+	/* cap */
+	
     capAndNormalizeFV_loop_28(&i, &this, &j, &k);
+
 
 	/* renormalize */
 	norm = 0.0;
-
+	
     capAndNormalizeFV_loop_29(&i, &this, &j, &k, &norm);
-	norm = sqrt(norm);
 
+	norm = sqrt(norm);
+	
     capAndNormalizeFV_loop_30(&i, &this, &j, &k, &norm);
+
 }
 
 void printKeyPoint(KeyPoint *this, FILE *out) {
@@ -493,8 +523,9 @@ void printKeyPoint(KeyPoint *this, FILE *out) {
 
 	fprintf(out, "%.2f %.2f %.2f %.3f\n", this->finalY, this->finalX, this->scale, this->orientation);
 
-
+	
     printKeyPoint_loop_31(&i, &this, &j, &k, &out, &count);
+
 	fprintf(out, "\n");
 }
 
@@ -506,14 +537,16 @@ void markImage(KeyPoint *list, Image* image) {
 	int      endX, endY;
 	int      arrowX, arrowY;
 
-
+	
     markImage_loop_32(&current, &list, &length, &degree, &endX, &endY, &image, &arrowX, &arrowY);
+
 }
 
 void markImageSPoint(KeyPoint *list, Image* image, double scale) {
 
 	KeyPoint *current;
 
-
+	
     markImageSPoint_loop_33(&current, &list, &image, &scale);
+
 }

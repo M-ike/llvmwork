@@ -211,11 +211,13 @@ int main(int argc, char **argv) {
 	/* output keypoint descriptors */
 	printf("Output\n");
 	output = fopen("output.txt", "w");
-
+	
     main_loop_1(&keyCounter, &keypoints, &totalKeypoints);
-	fprintf(output, "%d %d\n", totalKeypoints, 128);
 
+	fprintf(output, "%d %d\n", totalKeypoints, 128);
+	
     main_loop_2(&keyCounter, &keypoints, &output);
+
 	fclose(output);
 
 	/* output keypoints on image*/
@@ -240,8 +242,9 @@ void printTrashed(FILE *output, KeyPoint *trash, double scale, int octave) {
 	fprintf(output, "Octave %d\n", octave);
 	fprintf(output, "--------\n");
 	fprintf(output, "   y    x level  scale reason\n");
-
+	
     printTrashed_loop_3(&counter, &trash, &output, &scale);
+
 	fprintf(output, "\n");
 }
 
@@ -252,8 +255,9 @@ void printPoints(FILE *output, KeyPoint *peaks, double scale, int octave) {
 	fprintf(output, "Octave %d\n", octave);
 	fprintf(output, "--------\n");
 	fprintf(output, "   y    x level  scale note\n");
-
+	
     printPoints_loop_4(&counter, &peaks, &output, &scale);
+
 	fprintf(output, "\n");
 }
 

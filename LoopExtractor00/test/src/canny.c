@@ -28,15 +28,17 @@ Image *getCannyEdgesClassic(Image *original, float sigma, float percent) {
 	maskY = (double **) malloc(maskSize*sizeof(double *));
 	if(maskX == NULL || maskY == NULL)
 		return NULL;
-
+	
     getCannyEdgesClassic_loop_1(&i, &maskSize, &maskX, &maskY);
+
 
 	outpicX = (double **) malloc(original->height*sizeof(double *));
 	outpicY = (double **) malloc(original->height*sizeof(double *));
 	if(outpicX == NULL || outpicY == NULL)
 		return NULL;
-
+	
     getCannyEdgesClassic_loop_2(&i, &original, &outpicX, &outpicY);
+
 
 	outImage = (Image *) malloc(sizeof(Image));
 	outImage->width = original->width;
@@ -44,51 +46,61 @@ Image *getCannyEdgesClassic(Image *original, float sigma, float percent) {
 	outImage->pic = (float **) malloc(outImage->height*sizeof(float *));
 	if(outImage->pic == NULL)
 		return NULL;
-
+	
     getCannyEdgesClassic_loop_3(&i, &outImage);
+
 
 	/*generate masks*/
 	normalizeFactor = 1.0/(2.0*M_PI*sigma*sigma);
-
+	
     getCannyEdgesClassic_loop_4(&p, &mr, &q, &maskval, &normalizeFactor, &sigma, &maskX, &centY, &centX, &maskY);
 
-	/*convolve masks with picture*/
 
+	/*convolve masks with picture*/
+	
     getCannyEdgesClassic_loop_5(&i, &mr, &original, &j, &sum1, &sum2, &p, &q, &maskX, &centY, &centX, &maskY, &outpicX, &outpicY);
 
-	/*compute strength/magnitude*/
 
+	/*compute strength/magnitude*/
+	
     getCannyEdgesClassic_loop_6(&i, &original, &j, &outImage, &mr, &outpicX, &outpicY);
+
 		
 	if(percent < 0 || percent > 1)
 		percent = 0.20;
 		
 	/* scale to (0,1) for canny -- necessary? */
 	max = 0.0;
-
+	
     getCannyEdgesClassic_loop_7(&i, &outImage, &j, &max);
 
+	
     getCannyEdgesClassic_loop_8(&i, &outImage, &j, &max);
+
 	
 	/* allocate peaks image */
 	peaks = (Image *) malloc(sizeof(Image));
 	peaks->width = original->width;
 	peaks->height = original->height;
 	peaks->pic = (float **) malloc(peaks->height*sizeof(float *));
-
+	
     getCannyEdgesClassic_loop_9(&i, &peaks);
 
-	/*edge detection/peaks of ridges*/
 
+	/*edge detection/peaks of ridges*/
+	
     getCannyEdgesClassic_loop_10(&i, &peaks, &j, &xDiff, &outpicX, &yDiff, &outpicY, &angle, &outImage);
 
-	/*compute high/low thresholds*/
 
+	/*compute high/low thresholds*/
+	
     getCannyEdgesClassic_loop_11(&i, &outImage, &j, hist);
+
 	sum = 0;
 	picPercent = (int) (percent*outImage->width*outImage->height);
-
+	
     getCannyEdgesClassic_loop_12(&i, &sum, hist, &picPercent, &HI);
+
 	LO = 0.35*HI;
 
 	/* allocate canny image */
@@ -96,31 +108,40 @@ Image *getCannyEdgesClassic(Image *original, float sigma, float percent) {
 	canny->width = original->width;
 	canny->height = original->height;
 	canny->pic = (float **) malloc(canny->height*sizeof(float *));
-
+	
     getCannyEdgesClassic_loop_13(&i, &canny);
 
+	
     getCannyEdgesClassic_loop_14(&i, &canny, &j);
 
-	/* hysterisis/double thresholding */
 
+	/* hysterisis/double thresholding */
+	
     getCannyEdgesClassic_loop_15(&i, &outImage, &j, &peaks, &HI, &canny, &LO);
 
 
+	
     getCannyEdgesClassic_loop_16(&i, &peaks, &j, &canny);
+
 	
 	/* clear border pixels */
-
+	
     getCannyEdgesClassic_loop_17(&i, &mr, &j, &canny);
 
+	
     getCannyEdgesClassic_loop_18(&i, &canny, &mr, &j);
 
+	
     getCannyEdgesClassic_loop_19(&i, &canny, &j, &mr);
 
+	
     getCannyEdgesClassic_loop_20(&i, &canny, &j, &mr);
 
-	/* deallocate memory */
 
+	/* deallocate memory */
+	
     getCannyEdgesClassic_loop_21(&i, &peaks, &outImage);
+
 	free(peaks->pic);
 	free(outImage->pic);
 	free(peaks);
@@ -161,8 +182,9 @@ Image *getCannyEdges(Image *image, float sigma, float percent, Image *angleSourc
 		yDeriv = getDerivativeY(original);
 		
 		/* compute gradient */
-
+		
     getCannyEdges_loop_22(&i, &original, &j, &xDeriv, &yDeriv);
+
 	}
 	
 	if(percent < 0 || percent > 1)
@@ -170,30 +192,36 @@ Image *getCannyEdges(Image *image, float sigma, float percent, Image *angleSourc
 		
 	/* scale to (0,1) for canny -- necessary? */
 	max = 0.0;
-
+	
     getCannyEdges_loop_23(&i, &original, &j, &max);
 
+	
     getCannyEdges_loop_24(&i, &original, &j, &max);
+
 	
 	/* allocate peaks image */
 	peaks = (Image *) malloc(sizeof(Image));
 	peaks->width = original->width;
 	peaks->height = original->height;
 	peaks->pic = (float **) malloc(peaks->height*sizeof(float *));
-
+	
     getCannyEdges_loop_25(&i, &peaks);
 
-	/*edge detection/peaks of ridges*/
 
+	/*edge detection/peaks of ridges*/
+	
     getCannyEdges_loop_26(&i, &peaks, &j, &angleSource, &xDiff, &xDeriv, &yDiff, &yDeriv, &angle, &original);
 
-	/*compute high/low thresholds*/
 
+	/*compute high/low thresholds*/
+	
     getCannyEdges_loop_27(&i, &original, &j, hist);
+
 	sum = 0;
 	picPercent = (int) (percent*original->width*original->height);
-
+	
     getCannyEdges_loop_28(&i, &sum, hist, &picPercent, &HI);
+
 	LO = 0.35*HI;
 
 	/* allocate canny image */
@@ -201,21 +229,26 @@ Image *getCannyEdges(Image *image, float sigma, float percent, Image *angleSourc
 	canny->width = original->width;
 	canny->height = original->height;
 	canny->pic = (float **) malloc(canny->height*sizeof(float *));
-
+	
     getCannyEdges_loop_29(&i, &canny);
 
+	
     getCannyEdges_loop_30(&i, &canny, &j);
 
-	/* hysterisis/double thresholding */
 
+	/* hysterisis/double thresholding */
+	
     getCannyEdges_loop_31(&i, &original, &j, &peaks, &HI, &canny, &LO);
 
 
+	
     getCannyEdges_loop_32(&i, &peaks, &j, &canny);
+
 	
 	/* deallocate memory */
-
+	
     getCannyEdges_loop_33(&i, &peaks, &original);
+
 	free(peaks->pic);
 	free(original->pic);
 	free(peaks);
@@ -289,52 +322,63 @@ Canny *newCannyPPM(ImageRGB *image, double sigma) {
 		
 	/* allocate the mask*/
 	gaussianx = (double **) malloc(gSize*sizeof(double *));
-
+	
     newCannyPPM_loop_34(&i, &gSize, &gaussianx);
-        gaussiany = (double **) malloc(gSize*sizeof(double *));
 
+        gaussiany = (double **) malloc(gSize*sizeof(double *));
+	
     newCannyPPM_loop_35(&i, &gSize, &gaussiany);
+
         
 	/* constant */
 	kappa = 1 / sqrt(2*M_PI*sigma*sigma);
         
 	/* calculate mask */
 	//q and p switched
-
+	
     newCannyPPM_loop_36(&i, &gSize, &q, &j, &p, &gaussianx, &kappa, &sigma, &gaussiany);
+
 	
 	/* allocate magnitude and theta arrays */
 	new->magnitude = (double **) malloc(new->height*sizeof(double *));
-
+	
     newCannyPPM_loop_37(&i, &new);
-	new->theta = (double **) malloc(new->height*sizeof(double *));
 
+	new->theta = (double **) malloc(new->height*sizeof(double *));
+	
     newCannyPPM_loop_38(&i, &new);
+
 	
 	/* convolve */
-
+	
     newCannyPPM_loop_39(&y, &new, &x, &dgxSum, &dgySum, &xrSum, &yrSum, &xgSum, &ygSum, &xbSum, &ybSum, &i, &gSize, &q, &j, &p, &image, &gaussianx, &gaussiany, &rMag, &gMag, &bMag);
+
 	
 	max = 0.0;
-
+	
     newCannyPPM_loop_40(&i, &new, &j, &max);
 
+	
     newCannyPPM_loop_41(&i, &new, &j, &max);
+
 	
 	/* deallocate gaussianx, gaussiany */
-
+	
     newCannyPPM_loop_42(&i, &gSize, &gaussianx, &gaussiany);
+
         free(gaussianx);
 	free(gaussiany);
 	
 	/* nonmaxima suppresion */
 	/* allocate peaks array */
 	peaks = (int **) malloc(new->height*sizeof(int *));
-
+	
     newCannyPPM_loop_43(&i, &new, &peaks);
-	// iterate through the gradient image
 
+	// iterate through the gradient image
+	
     newCannyPPM_loop_44(&y, &new, &x, &peaks, &sector);
+
 	
 	debug = allocateImageFromDoubles(new->magnitude, new->width, new->height);
 	writePGMFile(debug, "magnitudes.pgm");
@@ -345,43 +389,53 @@ Canny *newCannyPPM(ImageRGB *image, double sigma) {
 	findThresholds(new, &low, &high);
 	
 	/* eliminate low values */
-
+	
     newCannyPPM_loop_45(&y, &new, &x, &peaks, &low);
+
 	
 	new->edges = allocateImage(new->width, new->height);
         
 	/* keep high values */
-
+	
     newCannyPPM_loop_46(&y, &new, &x, &peaks, &high);
+
 	
 	writePGMFile(new->edges, "canny_thresh.pgm");
 	
 	/* allocate and initialize traced array */
 	traced = (int **) malloc(new->height*sizeof(int *));
-
+	
     newCannyPPM_loop_47(&i, &new, &traced);
 
+	
     newCannyPPM_loop_48(&i, &new, &j, &traced);
+
         
         // iterate through the pixels, if we find an edge that hasn't been traced yet, start
         //   the recursion there
-
+	
     newCannyPPM_loop_49(&y, &new, &x, &traced, &low, &peaks);
+
 	
 	/* clear border pixels, assumes picture is at least border x border */
 	border = (int) (3*new->sigma);
-
+	
     newCannyPPM_loop_50(&j, &border, &i, &new);
 
+	
     newCannyPPM_loop_51(&j, &new, &border, &i);
 
+	
     newCannyPPM_loop_52(&i, &border, &j, &new);
 
+	
     newCannyPPM_loop_53(&i, &new, &border, &j);
+
 	
 	/* deallocate peaks and traced arrays */
-
+	
     newCannyPPM_loop_54(&i, &new, &peaks, &traced);
+
 	free(peaks);
 	free(traced);
 	
@@ -403,53 +457,64 @@ Canny  *newCannyPGMTwoSources(Image *gradient, Image *gaussian) {
 	
 	/* allocate magnitude and theta arrays */
 	new->magnitude = (double **) malloc(new->height*sizeof(double *));
-
+	
     newCannyPGMTwoSources_loop_55(&i, &new);
-	new->theta = (double **) malloc(new->height*sizeof(double *));
 
+	new->theta = (double **) malloc(new->height*sizeof(double *));
+	
     newCannyPGMTwoSources_loop_56(&i, &new);
+
 	
 	/* initialize magnitudes and thetas */
-
+	
     newCannyPGMTwoSources_loop_57(&i, &new, &j, &gradient, &gaussian);
+
 	
 	/* nonmaxima suppresion */
 	/* allocate peaks array */
 	peaks = (int **) malloc(new->height*sizeof(int *));
-
+	
     newCannyPGMTwoSources_loop_58(&i, &new, &peaks);
+
 	
 	/* find peaks */
-
+	
     newCannyPGMTwoSources_loop_59(&y, &new, &x, &peaks, &sector);
+
 	
 	findThresholds(new, &low, &high);
 	
 	/* eliminate low values */
-
+	
     newCannyPGMTwoSources_loop_60(&y, &new, &x, &peaks, &low);
+
 	
 	new->edges = allocateImage(new->width, new->height);
         
 	/* keep high values */
-
+	
     newCannyPGMTwoSources_loop_61(&y, &new, &x, &peaks, &high);
+
 	
 	/* allocate and initialize traced array */
 	traced = (int **) malloc(new->height*sizeof(int *));
-
+	
     newCannyPGMTwoSources_loop_62(&i, &new, &traced);
 
+	
     newCannyPGMTwoSources_loop_63(&i, &new, &j, &traced);
+
         
         // iterate through the pixels, if we find an edge that hasn't been traced yet, start
         //   the recursion there
-
+	
     newCannyPGMTwoSources_loop_64(&y, &new, &x, &traced, &low, &peaks);
+
 	
 	/* deallocate peaks and traced arrays */
-
+	
     newCannyPGMTwoSources_loop_65(&i, &new, &peaks, &traced);
+
 	free(peaks);
 	free(traced);
 	
@@ -469,14 +534,16 @@ void findThresholds(Canny *this, double *low, double *high) {
 	
 	
 	// fill the histogram
-
+	
     findThresholds_loop_66(&i, &this, &j, hist);
+
         
         // work your way down the  histogram from the right, adding up the area
         //   if the area you're at is greater than the percent of pixels you want to choose,
         //   finish
-
+	
     findThresholds_loop_67(&c, &area, hist, &percent, &this);
+
         
 	// the value of C that you stop at is the high threshold
 	*high = (double) c / 255; //we are using floats
@@ -560,7 +627,8 @@ void freeCanny(Canny *this) {
 	int i;
 
 	freeImage(this->edges);
-
+	
     freeCanny_loop_68(&i, &this);
+
 	free(this);
 }

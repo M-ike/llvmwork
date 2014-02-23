@@ -1,4 +1,13 @@
-#include "test_loop_1.h"
+#include "test_loop_2.h"
+
+
+
+
+
+
+{1,'c'},
+{1,'h'}
+};
 
 
 
@@ -9,9 +18,9 @@ void swap(struct st *s1,Node *no);
 int main(int argc, char **argv) {
 
 #define N1 100
-    int sum = 0;
+    int i,sum = 0;
     struct stu s;
-    int i;
+    int inc;
     union Union u;
     u.a= 1;
     u.c = ' ';
@@ -24,10 +33,14 @@ int main(int argc, char **argv) {
     swap(&s1,&no);
     int jj = 1;
     sum++;
-
-    main_loop_1(&i, &s, &sum, &jj, &argc);
+    
+    main_loop_1(&inc, &s, &sum, &jj, &argc);
 /*This is
 a test*/
+
+
+    main_loop_2(&i, &sum);
+
 
     return sum;
 #undef N1

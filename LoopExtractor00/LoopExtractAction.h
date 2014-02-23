@@ -108,6 +108,7 @@ public:
         DeclToBeDealedPosition.clear();
         MacroInFile.clear();
         MacroContentInFile.clear();
+        MacroPosition.clear();
         FunctionInSourcePosition.clear();
     }
     ~LoopExtractorConsumer() {}
@@ -122,9 +123,11 @@ private:
     std::vector<const MacroInfo*> MacroInFile;
     
     std::vector<FunctionDecl*> FunctionInSource;
-    std::map<int,int> FunctionInSourcePosition;
+    //std::map<int,int> FunctionInSourcePosition;
+    std::vector< std::pair<int,std::pair<int,std::pair<int, int> > > > FunctionInSourcePosition; 
     //保存MacroContent
     std::map<int,std::string> MacroContentInFile;
+    std::vector< std::pair<int,std::pair<int,std::pair<int, int> > > > MacroPosition;
     llvm::DenseMap<FunctionDecl*,std::string> FunctionInSourceContent;
     //保存输入参数
     llvm::DenseMap<ForStmt*, std::vector<ValueDecl*> > InputArgs;
@@ -137,9 +140,11 @@ private:
     llvm::DenseMap<ForStmt*, std::string> LoopToFunction;
     //llvm::DenseMap<int,std::string> LoopToFunction;
     //记录循环位置:开始和结束
-        std::map<int, int> LoopPosition;
+    //std::map<int, int> LoopPosition;
+    std::vector< std::pair<int,std::pair<int,std::pair<int, int> > > > LoopPosition;
     //记录结构体的位置:开始和结束
-    std::map<int, int> DeclToBeDealedPosition;
+    //std::map<int, int> DeclToBeDealedPosition;
+    std::vector< std::pair<int,std::pair<int,std::pair<int, int> > > > DeclToBeDealedPosition;
     //记录for循环位置和对应的循环
     std::map<int, ForStmt*> ForPosition;
     //记录宏的信息
@@ -174,6 +179,11 @@ private:
     std::string getMacroInCodeBlock(FILE *fp);
     bool isInternalVarDecl(DeclRefExpr *DR);
     bool isInternalDecl(Decl *D);
+    bool isInTwoLocation(int lineStart,int colStart,int lineEnd,int colEnd ,int lineCount,int colCount);
+    bool isInLocationVector(std::vector< std::pair<int,std::pair<int,std::pair<int, int> > > > Position,
+                                                       int lineCount,int colCount,int &IN);
+   
+
 
     bool constructRecordDeclContent(FILE *fp, ASTContext &Context);
 };

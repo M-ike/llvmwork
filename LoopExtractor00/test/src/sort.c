@@ -44,7 +44,8 @@ void merge(double *table, int start, int mid, int end)
 			++k;
 		}
 	}
-
+	
     merge_loop_1(&j, &start, &k, &end, &table, &sorted_table);
+
 	free(sorted_table);
 }

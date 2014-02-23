@@ -111,8 +111,9 @@ int localizeIsWeak (ScaleSpace *this, KeyPoint *point)
 
 		/* once the values are copied, we don't need the matrix anymore */
 		rows = adj->rows;
-
+		
     localizeIsWeak_loop_1(&i, &rows, &adj);
+
 		free(adj);
 		adj = NULL;
 
@@ -288,16 +289,18 @@ Matrix *getAdjustment(ScaleSpace *this, KeyPoint *point, int level, double *dotP
 
 	/* dot product */
 	sum = 0.0;
-
+	
     getAdjustment_loop_2(&i, &result, &sum, &d);
+
 	*dotP = sum;
 
 	matrixCopy = (Matrix *) malloc(sizeof(Matrix));
 	matrixCopy->rows = 3;
 	matrixCopy->columns = 1;
 	matrixCopy->values = (double **) malloc(matrixCopy->rows*sizeof(double *));
-
+	
     getAdjustment_loop_3(&i, &matrixCopy);
+
 	matrixCopy->values[0][0] = gsl_vector_get(result, 0);
 	matrixCopy->values[1][0] = gsl_vector_get(result, 1);
 	matrixCopy->values[2][0] = gsl_vector_get(result, 2);
@@ -367,21 +370,25 @@ int isFingerTip(ScaleSpace *this, ScaleSpace *gaussian, KeyPoint *point) {
 	if(val > 0) //only accept mins
 		return 0;
 
-
+	
     isFingerTip_loop_4(&i, &MAX_SEARCH, &point, &this, &val, &diffImage, &PEAK_DEF, edgeX, &foundEdges, edgeY, &angle);
 
 
+	
     isFingerTip_loop_5(&i, &MAX_SEARCH, &point, &this, &val, &diffImage, &PEAK_DEF, edgeX, &foundEdges, edgeY, &angle);
+
 
 	if(foundEdges <= 0) {
 		return 0; //no edge here
 	}
 
-
+	
     isFingerTip_loop_6(&i, &MAX_SEARCH, &point, &this, &val, &diffImage, &PEAK_DEF, edgeX, &foundEdges, edgeY, &angle);
 
 
+	
     isFingerTip_loop_7(&i, &MAX_SEARCH, &point, &this, &val, &PEAK_DEF, edgeX, &foundEdges, edgeY, &angle, &diffImage);
+
 
 	//mark points
 	/*
@@ -401,21 +408,24 @@ int isFingerTip(ScaleSpace *this, ScaleSpace *gaussian, KeyPoint *point) {
 	}
 
 	//compute distances sq.
-
+	
     isFingerTip_loop_8(&i, &foundEdges, distance, edgeX, &point, edgeY);
+
 
 	//also look at peak values, should be similar
 	if(foundEdges == 3) {
-	{ int re_arg_pa1_9 = -1; int re_arg_pa2_9;
+			{ int re_arg_pa1_9 = -1; int re_arg_pa2_9;
     isFingerTip_loop_9(&i, &foundEdges, &j, distance, &re_arg_pa1_9, &re_arg_pa2_9);
 	if(re_arg_pa1_9 != -1) return re_arg_pa2_9; }
+
 	}
 	else { //foundEdges == 4
 		mergesort(distance, 0, 3);
 
 		//check distances are not all the same (circle)
-
+		
     isFingerTip_loop_10(&i, &foundEdges, distance);
+
 		if(i == foundEdges - 1) {
 			printf("***ALL SIMILAR\n");
 			return 0;
@@ -431,8 +441,9 @@ int isFingerTip(ScaleSpace *this, ScaleSpace *gaussian, KeyPoint *point) {
 	}
 
 	printf("  found edges for y=%d x=%d val=%f:\n", point->y, point->x, this->images[point->imageLevel]->pic[point->y][point->x]);
-
+	
     isFingerTip_loop_11(&i, &foundEdges);
+
 
 	return 1;
 }

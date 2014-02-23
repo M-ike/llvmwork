@@ -1,7 +1,7 @@
 #include "scalespace_loop_33.h"
 void buildScaleSpaceOctave_loop_1(int *i, ScaleSpace * *space, double *sigma, double *k)
 {
-	for((*i) = 0; (*i) < (*space)->imageCount; ++(*i)) {
+for((*i) = 0; (*i) < (*space)->imageCount; ++(*i)) {
 		(*space)->relativeScaleTable[(*i)] = (*sigma);
 		(*sigma) *= (*k);
 	}
@@ -9,7 +9,7 @@ void buildScaleSpaceOctave_loop_1(int *i, ScaleSpace * *space, double *sigma, do
 }
 void buildScaleSpaceOctave_loop_2(int *i, ScaleSpace * *space, double *sourceBlur, double *imageSigma, double *targetBlur, Image * *original, double *sigma)
 {
-	for((*i) = 0; (*i) < (*space)->imageCount; ++(*i)) {
+for((*i) = 0; (*i) < (*space)->imageCount; ++(*i)) {
 		if((*i) == 0)
 			(*sourceBlur) = (*imageSigma);
 		else
@@ -32,21 +32,21 @@ void buildScaleSpaceOctave_loop_2(int *i, ScaleSpace * *space, double *sourceBlu
 }
 void buildDifferences_loop_3(int *i, ScaleSpace * *space, ScaleSpace * *original)
 {
-	for((*i) = 0; (*i) < (*space)->imageCount; ++(*i)) {
+for((*i) = 0; (*i) < (*space)->imageCount; ++(*i)) {
 		(*space)->images[(*i)] = subtractImages((*original)->images[(*i)+1], (*original)->images[(*i)]);
 	}
 
 }
 void buildDifferences_loop_4(int *i, ScaleSpace * *space)
 {
-	for((*i) = 0; (*i) < (*space)->imgHeight; ++(*i)) {
+for((*i) = 0; (*i) < (*space)->imgHeight; ++(*i)) {
 		(*space)->processedLocalization[(*i)] = (int *) malloc((*space)->imgWidth*sizeof(int));
 	}
 
 }
 void buildDifferences_loop_5(int *i, ScaleSpace * *space, int *j)
 {
-	for((*i) = 0; (*i) < (*space)->imgHeight; ++(*i)) {
+for((*i) = 0; (*i) < (*space)->imgHeight; ++(*i)) {
 		for((*j) = 0; (*j) < (*space)->imgWidth; ++(*j)) {
 			(*space)->processedLocalization[(*i)][(*j)] = 0;
 		}
@@ -55,21 +55,21 @@ void buildDifferences_loop_5(int *i, ScaleSpace * *space, int *j)
 }
 void buildScaleSpaceEdges_loop_6(int *i, ScaleSpace * *space, ScaleSpace * *original)
 {
-	for((*i) = 0; (*i) < (*space)->imageCount; ++(*i)) {
+for((*i) = 0; (*i) < (*space)->imageCount; ++(*i)) {
 		(*space)->images[(*i)] = getDerivative((*original)->images[(*i)]);
 	}
 
 }
 void buildScaleSpaceCanny_loop_7(int *i, ScaleSpace * *space, ScaleSpace * *derivative, ScaleSpace * *gaussian)
 {
-	for((*i) = 0; (*i) < (*space)->imageCount; ++(*i)) {
+for((*i) = 0; (*i) < (*space)->imageCount; ++(*i)) {
 		(*space)->images[(*i)] = getCannyEdges((*derivative)->images[(*i)], 1.0, 0.20, (*gaussian)->images[(*i)]);
 	}
 
 }
 void findPeaks_loop_8(int *i, Image * *current, int *j, float *min, int *isMin, int *p, int *q, Image * *above, Image * *below, KeyPoint * *temp, int *DoGlevel, ScaleSpace * *this, KeyPoint * *peaks, float *max, int *isMax)
 {
-	for((*i) = 1; (*i) < (*current)->height - 1; ++(*i)) {
+for((*i) = 1; (*i) < (*current)->height - 1; ++(*i)) {
 		for((*j) = 1; (*j) < (*current)->width - 1; ++(*j)) {
 			(*min) = (*current)->pic[(*i)][(*j)];
 			(*isMin) = 1;
@@ -152,7 +152,7 @@ void findPeaks_loop_8(int *i, Image * *current, int *j, float *min, int *isMin, 
 }
 void printHistogram_loop_9(int *y, int *yMin, int *yMax, int *x, int *xMin, int *xMax, int *relativeX, KeyPoint * *point, int *relativeY, double *radius, double *yDiff, ScaleSpace * *this, double *xDiff, double *direction, int *binIndex, double *oneBinRad, double *magnitude, double bins[], double *sigma)
 {
-	for((*y) = (*yMin); (*y) < (*yMax); ++(*y)) {
+for((*y) = (*yMin); (*y) < (*yMax); ++(*y)) {
 		for((*x) = (*xMin); (*x) < (*xMax); ++(*x)) {
 
 			/* only accept points in circle */
@@ -179,7 +179,7 @@ void printHistogram_loop_9(int *y, int *yMin, int *yMax, int *x, int *xMin, int 
 }
 void printHistogram_loop_10(int *binIndex, double bins[], double *maxGradient)
 {
-	for((*binIndex) = 0; (*binIndex) < 36; ++(*binIndex)) {
+for((*binIndex) = 0; (*binIndex) < 36; ++(*binIndex)) {
 		//printf("%d=%f\n", (*binIndex), bins[(*binIndex)]);
 		if(bins[(*binIndex)] > (*maxGradient)) {
 			(*maxGradient) = bins[(*binIndex)];
@@ -189,7 +189,7 @@ void printHistogram_loop_10(int *binIndex, double bins[], double *maxGradient)
 }
 void printHistogram_loop_11(int *binIndex, int *barWidth, double bins[], double *maxGradient, int *i)
 {
-	for((*binIndex) = 0; (*binIndex) < 36; ++(*binIndex)) {
+for((*binIndex) = 0; (*binIndex) < 36; ++(*binIndex)) {
 		fprintf(histOutput2, "%2d. ", (*binIndex));
 		(*barWidth) = (int) (bins[(*binIndex)] / (*maxGradient) * 70.0);
 		for((*i) = 0; (*i) < (*barWidth); ++(*i))
@@ -200,7 +200,7 @@ void printHistogram_loop_11(int *binIndex, int *barWidth, double bins[], double 
 }
 void getMagnitudesAndOrientations_loop_12(int *i, int *height, int *j, int *width, int *k, int *imageLevels, double *xDiff, ScaleSpace * *this, double *yDiff)
 {
-	for((*i) = 1; (*i) < (*height) - 1; ++(*i)) {
+for((*i) = 1; (*i) < (*height) - 1; ++(*i)) {
 		for((*j) = 1; (*j) < (*width) - 1; ++(*j)) {
 			for((*k) = 1; (*k) < (*imageLevels); ++(*k)) {
 				(*xDiff) = (*this)->images[(*k)]->pic[(*i)][(*j)+1] - (*this)->images[(*k)]->pic[(*i)][(*j)-1];
@@ -215,7 +215,7 @@ void getMagnitudesAndOrientations_loop_12(int *i, int *height, int *j, int *widt
 }
 void allocate3D_loop_13(int *i, int *height, double *** *matrix, int *width)
 {
-	for((*i) = 0; (*i) < (*height); ++(*i)) {
+for((*i) = 0; (*i) < (*height); ++(*i)) {
 		(*matrix)[(*i)] = (double **) malloc((*width)*sizeof(double *));
 		if((*matrix)[(*i)] == NULL) {
 			printf("malloc returned null\n");
@@ -226,7 +226,7 @@ void allocate3D_loop_13(int *i, int *height, double *** *matrix, int *width)
 }
 void allocate3D_loop_14(int *i, int *height, int *j, int *width, double *** *matrix, int *depth)
 {
-	for((*i) = 0; (*i) < (*height); ++(*i)) {
+for((*i) = 0; (*i) < (*height); ++(*i)) {
 		for((*j) = 0; (*j) < (*width); ++(*j)) {
 			(*matrix)[(*i)][(*j)] = (double *) malloc((*depth)*sizeof(double));
 			if((*matrix)[(*i)][(*j)] == NULL) {
@@ -239,7 +239,7 @@ void allocate3D_loop_14(int *i, int *height, int *j, int *width, double *** *mat
 }
 void deallocate3D_loop_15(int *i, int *height, int *j, int *width, double *** *matrix)
 {
-	for((*i) = 0; (*i) < (*height); ++(*i)) {
+for((*i) = 0; (*i) < (*height); ++(*i)) {
 		for((*j) = 0; (*j) < (*width); ++(*j)) {
 			free((*matrix)[(*i)][(*j)]);
 		}
@@ -249,7 +249,7 @@ void deallocate3D_loop_15(int *i, int *height, int *j, int *width, double *** *m
 }
 void generateKeypoints_loop_16(KeyPoint * *current, KeyPoint * *peaks, ScaleSpace * *this, int *multipleKeypoints)
 {
-	for((*current) = (*peaks); (*current) != NULL; (*current) = (*current)->next) {
+for((*current) = (*peaks); (*current) != NULL; (*current) = (*current)->next) {
 		/* create a keypoint */
 		(*current) = generateKeypointSingle((*this), (*peaks), (*current), &(*multipleKeypoints));
 	}
@@ -257,7 +257,7 @@ void generateKeypoints_loop_16(KeyPoint * *current, KeyPoint * *peaks, ScaleSpac
 }
 void generateKeypointSingle_loop_17(int *y, int *yMin, int *yMax, int *x, int *xMin, int *xMax, int *relativeX, KeyPoint * *point, int *relativeY, double *radius, ScaleSpace * *this, double *oneBinRad, double bins[], double *sigma)
 {
-	for((*y) = (*yMin); (*y) < (*yMax); ++(*y)) {
+for((*y) = (*yMin); (*y) < (*yMax); ++(*y)) {
 		for((*x) = (*xMin); (*x) < (*xMax); ++(*x)) {
 
 			/* only accept points in circle */
@@ -279,7 +279,7 @@ void generateKeypointSingle_loop_17(int *y, int *yMin, int *yMax, int *x, int *x
 }
 void generateKeypointSingle_loop_18(int *binIndex, double bins[], double *maxGradient)
 {
-	for((*binIndex) = 0; (*binIndex) < 36; ++(*binIndex)) {
+for((*binIndex) = 0; (*binIndex) < 36; ++(*binIndex)) {
 		if(bins[(*binIndex)] > (*maxGradient)) {
 			(*maxGradient) = bins[(*binIndex)];
 		}
@@ -288,7 +288,7 @@ void generateKeypointSingle_loop_18(int *binIndex, double bins[], double *maxGra
 }
 void generateKeypointSingle_loop_19(int *binIndex, double bins[], double *maxGradient, int *maxBin)
 {
-	for((*binIndex) = 0; (*binIndex) < 36; ++(*binIndex)) {
+for((*binIndex) = 0; (*binIndex) < 36; ++(*binIndex)) {
 		if(bins[(*binIndex)] > (*maxGradient)) {
 			(*maxGradient) = bins[(*binIndex)];
 			(*maxBin) = (*binIndex);
@@ -298,7 +298,7 @@ void generateKeypointSingle_loop_19(int *binIndex, double bins[], double *maxGra
 }
 void generateKeypointSingle_loop_20(int *binIndex, int *maxBin, int isKeypoint[], double bins[], double *maxGradient, int *left, int *right)
 {
-	for((*binIndex) = 0; (*binIndex) < 36; ++(*binIndex)) {
+for((*binIndex) = 0; (*binIndex) < 36; ++(*binIndex)) {
 		if((*binIndex) == (*maxBin)) {
 			isKeypoint[(*binIndex)] = 2;
 			continue;
@@ -318,7 +318,7 @@ void generateKeypointSingle_loop_20(int *binIndex, int *maxBin, int isKeypoint[]
 }
 void generateKeypointSingle_loop_21(int *binIndex, int isKeypoint[], int *left, int *right, double bins[], double *maxDegreeCorrection, double *maxGradient, double *degree, double *oneBinRad, KeyPoint * *point, int * *extraCount, KeyPoint * *newKey, KeyPoint * *lastAddition, KeyPoint * *list)
 {
-	for((*binIndex) = 0; (*binIndex) < 36; ++(*binIndex)) {
+for((*binIndex) = 0; (*binIndex) < 36; ++(*binIndex)) {
 		if(!isKeypoint[(*binIndex)])
 			continue;
 
@@ -366,7 +366,7 @@ void generateKeypointSingle_loop_21(int *binIndex, int isKeypoint[], int *left, 
 }
 void createDescriptors_loop_22(KeyPoint * *current, KeyPoint * *list, double *angle, const int *descriptorDim, const int *directionCount, int *y, int *radius, int *x, int *imageX, int *imageY, ScaleSpace * *this, double *yR, double *xR, double *dir, int *i, int *j, int *k, double *magnitudeWeight, double *sigma, int *iy, int *ix, int *id, double *binX, double *binY, double *binDir, double *xDist, double *xySpacing, double *yDist, double *dirDist, double *dirSpacing)
 {
-	for((*current) = (*list); (*current) != NULL; (*current) = (*current)->next) {
+for((*current) = (*list); (*current) != NULL; (*current) = (*current)->next) {
 
 		/* for rotating coordinates -- subtracting keypoint orientation */
 		(*angle) = -(*current)->orientation;
@@ -456,12 +456,12 @@ void createDescriptors_loop_22(KeyPoint * *current, KeyPoint * *list, double *an
 			}
 		} //end descriptor calculation for all sample points
 		capAndNormalizeFV((*current));
-	} //end keypoint traversal loop
+	}
 
 }
 void allocateFeatureVector_loop_23(int *i, int *descriptorDim, float *** *matrix)
 {
-	for((*i) = 0; (*i) < (*descriptorDim); ++(*i)) {
+for((*i) = 0; (*i) < (*descriptorDim); ++(*i)) {
 		(*matrix)[(*i)] = (float **) malloc((*descriptorDim)*sizeof(float *));
 		if((*matrix)[(*i)] == NULL) {
 			printf("malloc returned null\n");
@@ -472,7 +472,7 @@ void allocateFeatureVector_loop_23(int *i, int *descriptorDim, float *** *matrix
 }
 void allocateFeatureVector_loop_24(int *i, int *descriptorDim, int *j, float *** *matrix, int *directionCount)
 {
-	for((*i) = 0; (*i) < (*descriptorDim); ++(*i)) {
+for((*i) = 0; (*i) < (*descriptorDim); ++(*i)) {
 		for((*j) = 0; (*j) < (*descriptorDim); ++(*j)) {
 			(*matrix)[(*i)][(*j)] = (float *) malloc((*directionCount)*sizeof(float));
 			if((*matrix)[(*i)][(*j)] == NULL) {
@@ -485,7 +485,7 @@ void allocateFeatureVector_loop_24(int *i, int *descriptorDim, int *j, float ***
 }
 void allocateFeatureVector_loop_25(int *i, int *descriptorDim, int *j, int *k, int *directionCount, float *** *matrix)
 {
-	for((*i) = 0; (*i) < (*descriptorDim); ++(*i)) {
+for((*i) = 0; (*i) < (*descriptorDim); ++(*i)) {
 		for((*j) = 0; (*j) < (*descriptorDim); ++(*j)) {
 			for((*k) = 0; (*k) < (*directionCount); ++(*k)) {
 				(*matrix)[(*i)][(*j)][(*k)] = 0.0f;
@@ -496,7 +496,7 @@ void allocateFeatureVector_loop_25(int *i, int *descriptorDim, int *j, int *k, i
 }
 void capAndNormalizeFV_loop_26(int *i, KeyPoint * *this, int *j, int *k, double *norm)
 {
-	for((*i) = 0; (*i) < (*this)->yDim; ++(*i)) {
+for((*i) = 0; (*i) < (*this)->yDim; ++(*i)) {
 		for((*j) = 0; (*j) < (*this)->xDim; ++(*j)) {
 			for((*k) = 0; (*k) < (*this)->orientationDim; ++(*k)) {
 				(*norm) += (*this)->featureVector[(*i)][(*j)][(*k)]*(*this)->featureVector[(*i)][(*j)][(*k)];
@@ -507,7 +507,7 @@ void capAndNormalizeFV_loop_26(int *i, KeyPoint * *this, int *j, int *k, double 
 }
 void capAndNormalizeFV_loop_27(int *i, KeyPoint * *this, int *j, int *k, double *norm)
 {
-	for((*i) = 0; (*i) < (*this)->yDim; ++(*i)) {
+for((*i) = 0; (*i) < (*this)->yDim; ++(*i)) {
 		for((*j) = 0; (*j) < (*this)->xDim; ++(*j)) {
 			for((*k) = 0; (*k) < (*this)->orientationDim; ++(*k)) {
 				(*this)->featureVector[(*i)][(*j)][(*k)] /= (*norm);
@@ -518,7 +518,7 @@ void capAndNormalizeFV_loop_27(int *i, KeyPoint * *this, int *j, int *k, double 
 }
 void capAndNormalizeFV_loop_28(int *i, KeyPoint * *this, int *j, int *k)
 {
-	for((*i) = 0; (*i) < (*this)->yDim; ++(*i)) {
+for((*i) = 0; (*i) < (*this)->yDim; ++(*i)) {
 		for((*j) = 0; (*j) < (*this)->xDim; ++(*j)) {
 			for((*k) = 0; (*k) < (*this)->orientationDim; ++(*k)) {
 				if((*this)->featureVector[(*i)][(*j)][(*k)] > CAP)
@@ -530,7 +530,7 @@ void capAndNormalizeFV_loop_28(int *i, KeyPoint * *this, int *j, int *k)
 }
 void capAndNormalizeFV_loop_29(int *i, KeyPoint * *this, int *j, int *k, double *norm)
 {
-	for((*i) = 0; (*i) < (*this)->yDim; ++(*i)) {
+for((*i) = 0; (*i) < (*this)->yDim; ++(*i)) {
 		for((*j) = 0; (*j) < (*this)->xDim; ++(*j)) {
 			for((*k) = 0; (*k) < (*this)->orientationDim; ++(*k)) {
 				(*norm) += (*this)->featureVector[(*i)][(*j)][(*k)]*(*this)->featureVector[(*i)][(*j)][(*k)];
@@ -541,7 +541,7 @@ void capAndNormalizeFV_loop_29(int *i, KeyPoint * *this, int *j, int *k, double 
 }
 void capAndNormalizeFV_loop_30(int *i, KeyPoint * *this, int *j, int *k, double *norm)
 {
-	for((*i) = 0; (*i) < (*this)->yDim; ++(*i)) {
+for((*i) = 0; (*i) < (*this)->yDim; ++(*i)) {
 		for((*j) = 0; (*j) < (*this)->xDim; ++(*j)) {
 			for((*k) = 0; (*k) < (*this)->orientationDim; ++(*k)) {
 				(*this)->featureVector[(*i)][(*j)][(*k)] /= (*norm);
@@ -552,7 +552,7 @@ void capAndNormalizeFV_loop_30(int *i, KeyPoint * *this, int *j, int *k, double 
 }
 void printKeyPoint_loop_31(int *i, KeyPoint * *this, int *j, int *k, FILE * *out, int *count)
 {
-	for((*i) = 0; (*i) < (*this)->yDim; ++(*i)) {
+for((*i) = 0; (*i) < (*this)->yDim; ++(*i)) {
 		for((*j) = 0; (*j) < (*this)->xDim; ++(*j)) {
 			for((*k) = 0; (*k) < (*this)->orientationDim; ++(*k)) {
 				fprintf((*out), " %d", (int) (255*(*this)->featureVector[(*i)][(*j)][(*k)]));
@@ -570,7 +570,7 @@ void printKeyPoint_loop_31(int *i, KeyPoint * *this, int *j, int *k, FILE * *out
 }
 void markImage_loop_32(KeyPoint * *current, KeyPoint * *list, double *length, double *degree, int *endX, int *endY, Image * *image, int *arrowX, int *arrowY)
 {
-	for((*current) = (*list); (*current) != NULL; (*current) = (*current)->next) {
+for((*current) = (*list); (*current) != NULL; (*current) = (*current)->next) {
 		(*length) = (*current)->scale * 5; /* x5 for small scales */
 		(*degree) = (*current)->orientation;
 		(*endX) = (int) ((*current)->finalX + cos((*degree))*(*length));
@@ -589,7 +589,7 @@ void markImage_loop_32(KeyPoint * *current, KeyPoint * *list, double *length, do
 }
 void markImageSPoint_loop_33(KeyPoint * *current, KeyPoint * *list, Image * *image, double *scale)
 {
-	for((*current) = (*list); (*current) != NULL; (*current) = (*current)->next) {
+for((*current) = (*list); (*current) != NULL; (*current) = (*current)->next) {
 		(*image)->pic[(int) ((*current)->y*(*scale))][(int) ((*current)->x*(*scale))] = 1.0;
 	}
 

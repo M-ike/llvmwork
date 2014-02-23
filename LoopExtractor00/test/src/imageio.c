@@ -28,8 +28,9 @@ Image *readPGMFile(const char *fileName) {
 		c = getc(imageFile);
 	}
 	/* save width */
-
+	
     readPGMFile_loop_1(&i, number, &c, &imageFile);
+
 	number[i] = '\0';
 	width = atoi(number);
 
@@ -41,15 +42,17 @@ Image *readPGMFile(const char *fileName) {
 		c = getc(imageFile);
 	}
 	/* save height */
-
+	
     readPGMFile_loop_2(&i, number, &c, &imageFile);
+
 	number[i] = '\0';
 	height = atoi(number);
 
 	while(isspace((c = getc(imageFile))))
 		;
-
+	
     readPGMFile_loop_3(&i, number, &c, &imageFile);
+
 	number[i] = '\0';
 	maxval = atoi(number);
 
@@ -62,8 +65,9 @@ Image *readPGMFile(const char *fileName) {
 	image = allocateImage(width, height);
 
 	//read data
-
+	
     readPGMFile_loop_4(&i, &image, &j, &value, &imageFile);
+
 	fclose(imageFile);
 	return image;
 }
@@ -86,15 +90,17 @@ void writePGMFile(Image *image, const char *fileName) {
 	
 	/* find max pixel value to scale down values to [0,1] */
 	maxival = 0.0;
-	{ int re_arg_pa1_5 = -1; 
+		{ int re_arg_pa1_5 = -1; 
     writePGMFile_loop_5(&i, &image, &j, &output, &maxival, &re_arg_pa1_5);
 	if(re_arg_pa1_5 != -1) return; }
+
 
 	fprintf(output, "P5\n");
 	fprintf(output, "%d %d\n", image->width, image->height);
 	fprintf(output, "255\n");
-
+	
     writePGMFile_loop_6(&i, &image, &j, &value, &maxival, &output);
+
 	fclose(output);
 }
 
@@ -107,8 +113,9 @@ void writePGMFileNegative(Image *image, FILE *output) {
 	/* find max and min pixel values to scale values to [0,1] */
 	maxival = -1.0;
 	minival = 1.0;
-
+	
     writePGMFileNegative_loop_7(&i, &image, &j, &maxival, &minival);
+
 
 	if(fabs(maxival) > fabs(minival))
 		maxval = fabs(maxival);
@@ -118,8 +125,9 @@ void writePGMFileNegative(Image *image, FILE *output) {
 	fprintf(output, "P5\n");
 	fprintf(output, "%d %d\n", image->width, image->height);
 	fprintf(output, "255\n");
-
+	
     writePGMFileNegative_loop_8(&i, &image, &j, &value, &maxval, &output);
+
 }
 
 ImageRGB *readPPMFile(const char *fileName) {
@@ -151,8 +159,9 @@ ImageRGB *readPPMFile(const char *fileName) {
 		c = getc(imageFile);
 	}
 	/* save width */
-
+	
     readPPMFile_loop_9(&i, number, &c, &imageFile);
+
 	number[i] = '\0';
 	width = atoi(number);
 
@@ -164,15 +173,17 @@ ImageRGB *readPPMFile(const char *fileName) {
 		c = getc(imageFile);
 	}
 	/* save height */
-
+	
     readPPMFile_loop_10(&i, number, &c, &imageFile);
+
 	number[i] = '\0';
 	height = atoi(number);
 
 	while(isspace((c = getc(imageFile))))
 		;
-
+	
     readPPMFile_loop_11(&i, number, &c, &imageFile);
+
 	number[i] = '\0';
 	maxval = atoi(number);
 
@@ -185,8 +196,9 @@ ImageRGB *readPPMFile(const char *fileName) {
 	image = allocateImageRGB(width, height);
 
 	//read data
-
+	
     readPPMFile_loop_12(&i, &image, &j, &value, &imageFile);
+
 	fclose(imageFile);
 	return image;
 }
@@ -207,15 +219,17 @@ void writePPMFile(ImageRGB *image, const char *fileName) {
 	
 	/* find max pixel value to scale down values to [0,1] */
 	maxival = 0.0;
-	{ int re_arg_pa1_13 = -1; 
+		{ int re_arg_pa1_13 = -1; 
     writePPMFile_loop_13(&i, &image, &j, &output, &maxival, &re_arg_pa1_13);
 	if(re_arg_pa1_13 != -1) return; }
+
 
 	fprintf(output, "P6\n");
 	fprintf(output, "%d %d\n", image->width, image->height);
 	fprintf(output, "255\n");
-
+	
     writePPMFile_loop_14(&i, &image, &j, &value, &maxival, &output);
+
 	fclose(output);
 }
 
@@ -228,8 +242,9 @@ void writePPMFileNegative(ImageRGB *image, FILE *output) {
 	/* find max and min pixel values to scale values to [0,1] */
 	maxival = -1.0;
 	minival = 1.0;
-
+	
     writePPMFileNegative_loop_15(&i, &image, &j, &maxival, &minival);
+
 
 	if(fabs(maxival) > fabs(minival))
 		maxval = fabs(maxival);
@@ -239,8 +254,9 @@ void writePPMFileNegative(ImageRGB *image, FILE *output) {
 	fprintf(output, "P6\n");
 	fprintf(output, "%d %d\n", image->width, image->height);
 	fprintf(output, "255\n");
-
+	
     writePPMFileNegative_loop_16(&i, &image, &j, &value, &maxval, &output);
+
 }
 
 
@@ -266,8 +282,9 @@ Image *readDATFile(const char *fileName) {
 	image = allocateImage(width, height);
 
 	//read data
-
+	
     readDATFile_loop_17(&i, &image, &j, &imageFile, &value);
+
 		fclose(imageFile);
 		return image;
 }
@@ -288,11 +305,13 @@ void writeDATFile(Image *image, const char *fileName) {
 
 	/* find max pixel value to scale down values to [0,1] */
 	maxival = 0.0;
-
+	
     writeDATFile_loop_18(&i, &image, &j, &maxival);
 
-	fprintf(output, "%d\n%d\n", image->height, image->width);
 
+	fprintf(output, "%d\n%d\n", image->height, image->width);
+	
     writeDATFile_loop_19(&i, &image, &j, &value, &maxival, &output);
+
 		fclose(output);
 }

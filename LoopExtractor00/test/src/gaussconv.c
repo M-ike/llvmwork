@@ -22,15 +22,17 @@ Image* gaussianD1Convolution2D(Image *original, double sigma) {
 	maskY = (double **) malloc(maskSize*sizeof(double *));
 	if(maskX == NULL || maskY == NULL)
 		return NULL;
-
+	
     gaussianD1Convolution2D_loop_1(&i, &maskSize, &maskX, &maskY);
+
 
 	outpicX = (double **) malloc(original->height*sizeof(double *));
 	outpicY = (double **) malloc(original->height*sizeof(double *));
 	if(outpicX == NULL || outpicY == NULL)
 		return NULL;
-
+	
     gaussianD1Convolution2D_loop_2(&i, &original, &outpicX, &outpicY);
+
 
 	outImage = (Image *) malloc(sizeof(Image));
 	outImage->width = original->width;
@@ -38,30 +40,36 @@ Image* gaussianD1Convolution2D(Image *original, double sigma) {
 	outImage->pic = (float **) malloc(outImage->height*sizeof(float *));
 	if(outImage->pic == NULL)
 		return NULL;
-
+	
     gaussianD1Convolution2D_loop_3(&i, &outImage);
+
 
 	/*generate masks*/
 	normalizeFactor = 1.0/(2.0*M_PI*sigma*sigma);
-
+	
     gaussianD1Convolution2D_loop_4(&p, &mr, &q, &maskval, &normalizeFactor, &sigma, &maskX, &centY, &centX, &maskY);
 
-	/*convolve masks with picture*/
 
+	/*convolve masks with picture*/
+        
     gaussianD1Convolution2D_loop_5(&i, &mr, &original, &j, &sum1, &sum2, &p, &q, &maskX, &centY, &centX, &maskY, &outpicX, &outpicY);
 
-	/*compute strength/magnitude*/
 
+	/*compute strength/magnitude*/
+        
     gaussianD1Convolution2D_loop_6(&i, &original, &j, &outImage, &mr, &outpicX, &outpicY);
 
-	/* deallocate memory */
 
+	/* deallocate memory */
+	
     gaussianD1Convolution2D_loop_7(&i, &maskSize, &maskX, &maskY);
+
 	free(maskX);
 	free(maskY);
 
-
+	
     gaussianD1Convolution2D_loop_8(&i, &original, &outpicX, &outpicY);
+
 	free(outpicX);
 	free(outpicY);
 
@@ -91,14 +99,16 @@ Image* gaussianConvolution2D(Image *original, double sigma) {
 	mask = (double **) malloc(maskSize*sizeof(double *));
 	if(mask == NULL)
 		return NULL;
-
+	
     gaussianConvolution2D_loop_9(&i, &maskSize, &mask);
+
 
 	outpic = (double **) malloc(original->height*sizeof(double *));
 	if(outpic == NULL)
 		return NULL;
-
+	
     gaussianConvolution2D_loop_10(&i, &original, &outpic);
+
 
 	outImage = (Image *) malloc(sizeof(Image));
 	outImage->width = original->width;
@@ -106,29 +116,35 @@ Image* gaussianConvolution2D(Image *original, double sigma) {
 	outImage->pic = (float **) malloc(outImage->height*sizeof(float *));
 	if(outImage->pic == NULL)
 		return NULL;
-
+	
     gaussianConvolution2D_loop_11(&i, &outImage);
+
 
 	/*generate masks*/
 	normalizeFactor = 1.0/(2.0*M_PI*sigma*sigma);
-
+	
     gaussianConvolution2D_loop_12(&p, &mr, &q, &maskval, &normalizeFactor, &sigma, &mask, &centY, &centX);
 
-	/*convolve masks with picture*/
 
+	/*convolve masks with picture*/
+        
     gaussianConvolution2D_loop_13(&i, &mr, &original, &j, &sum, &p, &q, &mask, &centY, &centX, &outpic);
 
-	/*compute strength/magnitude*/
 
+	/*compute strength/magnitude*/
+        
     gaussianConvolution2D_loop_14(&i, &original, &j, &outImage, &mr, &outpic);
 
-	/* deallocate memory */
 
+	/* deallocate memory */
+	
     gaussianConvolution2D_loop_15(&i, &maskSize, &mask);
+
 	free(mask);
 
-
+	
     gaussianConvolution2D_loop_16(&i, &original, &outpic);
+
 	free(outpic);
 
 	return outImage;
@@ -162,8 +178,9 @@ Image* gaussianConvolution2DFast(Image *original, double sigma) {
 	outpicY = (double **) malloc(original->height*sizeof(double *));
 	if(outpicY == NULL)
 		return NULL;
-
+	
     gaussianConvolution2DFast_loop_17(&i, &original, &outpicY);
+
 
 	outImage = (Image *) malloc(sizeof(Image));
 	outImage->width = original->width;
@@ -171,30 +188,36 @@ Image* gaussianConvolution2DFast(Image *original, double sigma) {
 	outImage->pic = (float **) malloc(outImage->height*sizeof(float *));
 	if(outImage->pic == NULL)
 		return NULL;
-
+	
     gaussianConvolution2DFast_loop_18(&i, &outImage);
 
-	/* initialize */
 
+	/* initialize */
+	
     gaussianConvolution2DFast_loop_19(&i, &original, &j, &outpicY, &outImage);
+
 
 	/*generate mask*/
 	normalizeFactor = 1.0/(sqrt(2.0*M_PI)*sigma);
-
+	
     gaussianConvolution2DFast_loop_20(&i, &maskSize, &p, &maskMiddle, &mask, &normalizeFactor, &sigma);
 
-	/*convolve 1D -- vertical pass*/
 
+	/*convolve 1D -- vertical pass*/
+	
     gaussianConvolution2DFast_loop_21(&i, &original, &j, &sum, &isOut, &outBound, &p, &maskSize, &q, &maskMiddle, &mask, &outpicY);
 
-	/*convolve 1D -- horizontal pass*/
 
+	/*convolve 1D -- horizontal pass*/
+	
     gaussianConvolution2DFast_loop_22(&i, &original, &j, &sum, &isOut, &outBound, &p, &maskSize, &q, &maskMiddle, &mask, &outpicY, &outImage);
+
 
 	/* deallocate memory */
 	free(mask);
-
+	
     gaussianConvolution2DFast_loop_23(&i, &original, &outpicY);
+
 	free(outpicY);
 
 	return outImage;

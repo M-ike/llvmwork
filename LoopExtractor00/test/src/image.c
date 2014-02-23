@@ -18,13 +18,15 @@ Image *allocateImage(int width, int height) {
 		printf("***image.c/allocateImage: malloc() returned NULL");
 		return NULL;
 	}
-	{ int re_arg_pa1_1 = -1; Image * re_arg_pa2_1;
+		{ int re_arg_pa1_1 = -1; Image * re_arg_pa2_1;
     allocateImage_loop_1(&i, &new, &j, &re_arg_pa1_1, &re_arg_pa2_1);
 	if(re_arg_pa1_1 != -1) return re_arg_pa2_1; }
+
 	
 	/* initialize */
-
+	
     allocateImage_loop_2(&i, &new, &j);
+
 	return new;
 }
 
@@ -34,8 +36,9 @@ Image *allocateImageFromDoubles(double **array, int width, int height) {
 	int   i, j;
 
 	new = allocateImage(width, height);
-
+	
     allocateImageFromDoubles_loop_3(&i, &new, &j, &array);
+
 	return new;
 }
 
@@ -46,8 +49,9 @@ Image *allocateImageFromInts(int **array, int maxValue, int width, int height) {
 	int   i, j;
 
 	new = allocateImage(width, height);
-
+	
     allocateImageFromInts_loop_4(&i, &new, &j, &array, &maxValue);
+
 	return new;
 }
 
@@ -55,8 +59,9 @@ void freeImage(Image *image) {
 
 	int i;
 	
-
+	
     freeImage_loop_5(&i, &image);
+
 	free(image->pic);
 	free(image);
 }
@@ -75,8 +80,9 @@ Image *halveImage(Image *original)
 
 	/* initialization of the halved image */
 	halved = allocateImage(original->width/2, original->height/2);
-
+	
     halveImage_loop_6(&i, &halved, &j, &original);
+
 	return halved;
 }
 
@@ -101,8 +107,9 @@ Image *doubleImage(Image *original)
 
 	// fill four pixels per step, except for the last row/col, which will
 	// be filled with 0
-
+	
     doubleImage_loop_7(&i, &original, &j, &doubled);
+
 	
 	return doubled;
 }
@@ -174,16 +181,19 @@ Image *doubleCanny(Image *original) {
 	doubled->width = 2*original->width;
 	doubled->height = 2*original->height;
 	doubled->pic = (float **) malloc(doubled->height*sizeof(float *));
-
+	
     doubleCanny_loop_8(&i, &doubled);
+
 	
 	//copy exisiting pixels
-
+	
     doubleCanny_loop_9(&i, &original, &j, &doubled);
 
-	// fill new pixels
 
+	// fill new pixels
+	
     doubleCanny_loop_10(&i, &original, &j, &doubled);
+
 	
 	return doubled;
 }
@@ -245,8 +255,9 @@ Image *subtractImages(Image *one, Image *two) {
 	newImage = allocateImage(one->width, one->height);
 
 	/* subtract */
-
+	
     subtractImages_loop_11(&i, &one, &j, &newImage, &two);
+
 		
 	return newImage;
 }
@@ -260,8 +271,9 @@ Image *cloneImage(Image *original) {
 	newImage = allocateImage(original->width, original->height);
 	
 	/* copy values */
-
+	
     cloneImage_loop_12(&i, &newImage, &j, &original);
+
 	return newImage;
 }
 
@@ -277,8 +289,9 @@ float** getDerivativeX(Image *original) {
 
 	/* allocate space for x component */
 	imageX = (float **) malloc(original->height*sizeof(float *));
-
+	
     getDerivativeX_loop_13(&i, &original, &imageX);
+
 
 	/* convolve OLD ROBERTS
 	for(i = 0; i < original->height; ++i) {
@@ -296,8 +309,9 @@ float** getDerivativeX(Image *original) {
 		}
 	}*/
 	
-
+	
     getDerivativeX_loop_14(&i, &original, &j, &sum1, &p, maskX, &imageX);
+
 	
 	return imageX;
 }
@@ -314,8 +328,9 @@ float** getDerivativeY(Image *original) {
 
 	/* allocate space for y component */
 	imageY = (float **) malloc(original->height*sizeof(float *));
-
+	
     getDerivativeY_loop_15(&i, &original, &imageY);
+
 
 	/* convolve OLD ROBERTS
 	for(i = 0; i < original->height; ++i) {
@@ -333,8 +348,9 @@ float** getDerivativeY(Image *original) {
 		}
 	}*/
 	
-
+	
     getDerivativeY_loop_16(&j, &original, &i, &sum2, &p, maskY, &imageY);
+
 
 	return imageY;
 }
@@ -354,12 +370,14 @@ Image *getDerivative(Image *original) {
 	imageY = getDerivativeY(original);
 
 	/* compute gradient */
-
+	
     getDerivative_loop_17(&i, &original, &j, &newImage, &imageX, &imageY);
 
-	/* deallocate storage */
 
+	/* deallocate storage */
+	
     getDerivative_loop_18(&i, &original, &imageX, &imageY);
+
 	free(imageX);
 	free(imageY);
 
@@ -398,15 +416,17 @@ int isPeak(Image *image, int x, int y, int direction) {
 		return 0; //error
 
 	//iterates if equal value
-	{ int re_arg_pa1_19 = -1; int re_arg_pa2_19;
+		{ int re_arg_pa1_19 = -1; int re_arg_pa2_19;
     isPeak_loop_19(&i, &y, &j, &x, &image, &yIncr, &xIncr, &peakVal, &peakR, &re_arg_pa1_19, &re_arg_pa2_19);
 	if(re_arg_pa1_19 != -1) return re_arg_pa2_19; }
+
 	if(!peakR)
 		return 0;
 	//iterates if equal value
-	{ int re_arg_pa1_20 = -1; int re_arg_pa2_20;
+		{ int re_arg_pa1_20 = -1; int re_arg_pa2_20;
     isPeak_loop_20(&i, &y, &j, &x, &image, &yIncr, &xIncr, &peakVal, &peakL, &re_arg_pa1_20, &re_arg_pa2_20);
 	if(re_arg_pa1_20 != -1) return re_arg_pa2_20; }
+
 
 	return peakL;
 }
@@ -430,8 +450,9 @@ void drawLine(Image *image, int y1, int x1, int y2, int x2) {
 		}
 		dy = y2 - y1;
 		dx = x2 - x1;
-
+		
     drawLine_loop_21(&i, &x1, &x2, &comp, &y1, &dy, &dx, &image);
+
 	}
 	else {
 		/* sort points by y-axis */
@@ -441,8 +462,9 @@ void drawLine(Image *image, int y1, int x1, int y2, int x2) {
 		}
 		dy = y2 - y1;
 		dx = x2 - x1;
-
+		
     drawLine_loop_22(&i, &y1, &y2, &comp, &x1, &dx, &dy, &image);
+
 	}
 }
 
@@ -453,8 +475,9 @@ void exportCSV(Image *image, char *fileName) {
 	FILE *output;
 
 	output = fopen(fileName, "w");
-
+	
     exportCSV_loop_23(&i, &image, &j, &output);
+
 	fclose(output);
 }
 
@@ -463,8 +486,9 @@ float findMin(Image *image) {
 	float min = 1.5;
 	int   i, j;
 
-
+	
     findMin_loop_24(&i, &image, &j, &min);
+
 	return min;
 }
 
@@ -473,8 +497,9 @@ float findMax(Image *image) {
 	float max = -1.5;
 	int   i, j;
 
-
+	
     findMax_loop_25(&i, &image, &j, &max);
+
 	return max;
 }
 
@@ -523,7 +548,8 @@ ImageRGB *convertToRGB(Image *image) {
 	int i, j;
 	
 	new = allocateImageRGB(image->width, image->height);
-
+	
     convertToRGB_loop_26(&i, &image, &j, &new);
+
 	return new;
 }
